@@ -49,7 +49,7 @@ def validate_email(email):
 
 def validate_password(password):
     """
-    Validate password strength requirements.
+    Validate password requirements.
     
     Args:
         password (str): Password to validate
@@ -57,28 +57,14 @@ def validate_password(password):
     Returns:
         tuple: (is_valid, error_message)
     """
-    # Check minimum length
-    if len(password) < 8:
-        return False, 'Password must be at least 8 characters long'
-    
-    # Check for at least one uppercase letter
-    if not re.search(r'[A-Z]', password):
-        return False, 'Password must contain at least one uppercase letter'
-    
-    # Check for at least one lowercase letter
-    if not re.search(r'[a-z]', password):
-        return False, 'Password must contain at least one lowercase letter'
-    
-    # Check for at least one digit
-    if not re.search(r'\d', password):
-        return False, 'Password must contain at least one digit'
-    
+    if len(password) < 6:
+        return False, 'Password must be at least 6 characters long'
     return True, 'Password is valid'
 
 
 def validate_phone(phone):
     """
-    Validate phone number format (basic validation for Bangladesh).
+    Validate phone number format (supports international formats, +, spaces, dashes, parens).
     
     Args:
         phone (str): Phone number to validate
@@ -86,11 +72,8 @@ def validate_phone(phone):
     Returns:
         bool: True if phone format is valid, False otherwise
     """
-    # Remove spaces and hyphens
-    phone = phone.replace(' ', '').replace('-', '')
-    
-    # Check if it's all digits and between 10-15 digits
-    return phone.isdigit() and 10 <= len(phone) <= 15
+    cleaned = re.sub(r'[\s\-\+\(\)\.]', '', str(phone or ''))
+    return cleaned.isdigit() and 7 <= len(cleaned) <= 15
 
 
 # ============================================================================
@@ -157,7 +140,7 @@ def register():
         return jsonify({'error': 'Invalid email format'}), 400
     
     # Step 5: Check if email already exists in database
-    existing_user = User.query.filter_by(email=email).first()
+    existing_user = User.query.filter(db.func.lower(User.email) == email).first()
     if existing_user:
         return jsonify({'error': 'Email already registered'}), 409
     
@@ -279,7 +262,7 @@ def login():
         }), 400
     
     # Step 4: Query database for user with matching email
-    user = User.query.filter_by(email=email).first()
+    user = User.query.filter(db.func.lower(User.email) == email).first()
     
     # Step 5: Check if user exists and password is correct
     # Return 401 for both cases for security (don't reveal if email exists)

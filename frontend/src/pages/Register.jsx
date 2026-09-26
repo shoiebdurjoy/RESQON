@@ -115,7 +115,7 @@ export default function Register() {
               <label style={{ display: 'block', fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#8A8878', marginBottom: '0.375rem' }}>Password</label>
               <div style={{ position: 'relative' }}>
                 <input type={showPw ? 'text' : 'password'} className="input-field" style={{ paddingRight: '2.75rem' }}
-                  value={password} onChange={e => setPassword(e.target.value)} placeholder="Min. 8 characters" required autoComplete="new-password" />
+                  value={password} onChange={e => setPassword(e.target.value)} placeholder="Min. 6 characters" required autoComplete="new-password" />
                 <button type="button" onClick={() => setShowPw(s => !s)}
                   style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#8A8878', padding: 0, display: 'flex' }}>
                   {showPw ? <EyeOff size={15} /> : <Eye size={15} />}

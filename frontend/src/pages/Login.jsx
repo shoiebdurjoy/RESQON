@@ -14,7 +14,7 @@ export default function Login() {
   async function handleSubmit(e) {
     e.preventDefault(); setError(''); setLoading(true);
     try { 
-      await login(email, password); 
+      await login(email.trim(), password); 
       navigate('/dashboard'); 
     } catch (err) { 
       if (err.response?.status === 503 || (typeof err.response?.data === 'string' && err.response.data.includes('suspended'))) {

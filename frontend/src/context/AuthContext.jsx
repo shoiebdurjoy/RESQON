@@ -31,7 +31,8 @@ export function AuthProvider({ children }) {
     setIsLoading(true);
 
     try {
-      const response = await axios.post(`${API_URL}/auth/login`, { email, password });
+      const normalizedEmail = (email || '').trim().toLowerCase();
+      const response = await axios.post(`${API_URL}/auth/login`, { email: normalizedEmail, password });
       const accessToken = response.data?.access_token || response.data?.token;
 
       if (!accessToken) {

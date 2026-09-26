@@ -88,20 +88,36 @@ class User(db.Model):
     # ---- Methods ----
     
     def set_password(self, password):
-        """Hash and set the user's password using bcrypt."""
-        h = generate_password_hash(password)
-        if isinstance(h, bytes):
-            h = h.decode('utf-8')
-        self.password_hash = str(h)
+        """Hash and set the user's password using bcrypt with fallback."""
+        try:
+            from flask_bcrypt import generate_password_hash
+            h = generate_password_hash(password)
+            if isinstance(h, bytes):
+                h = h.decode('utf-8')
+            self.password_hash = str(h)
+        except Exception:
+            from werkzeug.security import generate_password_hash as gen_pw
+            self.password_hash = gen_pw(password)
     
     def check_password(self, password):
         """Verify a plain text password against the stored hash."""
         if not self.password_hash:
             return False
+        # 1. Bcrypt check
         try:
-            return check_password_hash(self.password_hash, password)
+            from flask_bcrypt import check_password_hash
+            if check_password_hash(self.password_hash, password):
+                return True
         except Exception:
-            return False
+            pass
+        # 2. Werkzeug check
+        try:
+            from werkzeug.security import check_password_hash as check_pw
+            if check_pw(self.password_hash, password):
+                return True
+        except Exception:
+            pass
+        return False
     
     def to_dict(self):
         """

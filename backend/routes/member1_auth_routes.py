@@ -35,22 +35,16 @@ def validate_email(email):
 
 
 def validate_password(password):
-    """Validate password strength requirements."""
-    if len(password) < 8:
-        return False, 'Password must be at least 8 characters long'
-    if not re.search(r'[A-Z]', password):
-        return False, 'Password must contain at least one uppercase letter'
-    if not re.search(r'[a-z]', password):
-        return False, 'Password must contain at least one lowercase letter'
-    if not re.search(r'\d', password):
-        return False, 'Password must contain at least one digit'
+    """Validate password requirements."""
+    if len(password) < 6:
+        return False, 'Password must be at least 6 characters long'
     return True, 'Password is valid'
 
 
 def validate_phone(phone):
-    """Validate phone number format."""
-    phone = phone.replace(' ', '').replace('-', '')
-    return phone.isdigit() and 10 <= len(phone) <= 15
+    """Validate phone number format (supports international formats, +, spaces, dashes, parens)."""
+    cleaned = re.sub(r'[\s\-\+\(\)\.]', '', str(phone or ''))
+    return cleaned.isdigit() and 7 <= len(cleaned) <= 15
 
 
 # ============================================================================
@@ -84,7 +78,7 @@ def register():
     if not validate_email(email):
         return jsonify({'error': 'Invalid email format'}), 400
     
-    existing_user = User.query.filter_by(email=email).first()
+    existing_user = User.query.filter(db.func.lower(User.email) == email).first()
     if existing_user:
         return jsonify({'error': 'Email already registered'}), 409
     
@@ -163,7 +157,7 @@ def login():
             'required': ['email', 'password']
         }), 400
     
-    user = User.query.filter_by(email=email).first()
+    user = User.query.filter(db.func.lower(User.email) == email).first()
     
     if not user or not user.check_password(password):
         return jsonify({'error': 'Invalid email or password'}), 401
@@ -171,6 +165,7 @@ def login():
     try:
         access_token = create_access_token(
             identity=str(user.id),
+            additional_claims={'role': user.role.value, 'name': user.name, 'email': user.email},
             expires_delta=timedelta(hours=24)
         )
         
