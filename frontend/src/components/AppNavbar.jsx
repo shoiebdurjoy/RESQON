@@ -119,7 +119,7 @@ export default function AppNavbar() {
         <NavLink to="/dashboard" style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', textDecoration: 'none', marginRight: '1.5rem', flexShrink: 0 }}>
           <Zap size={17} style={{ color: '#D93B2B' }} strokeWidth={2.5} />
           <span style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 800, fontSize: '1.0625rem', letterSpacing: '-0.02em', color: '#D93B2B' }}>
-            EMERGON
+            RESQON
           </span>
         </NavLink>
 

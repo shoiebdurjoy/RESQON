@@ -250,7 +250,7 @@ def create_app(config_name=None):
         """
         return jsonify({
             'status': 'healthy',
-            'service': 'Smart Emergency System API',
+            'service': 'RESQON Emergency Coordination API',
             'version': '1.0.0',
             'environment': config_name,
             'database': 'connected' if db.engine.pool.size() > 0 else 'disconnected'

@@ -29,25 +29,22 @@ bp = Blueprint('member4_misc', __name__)
 def get_messages(request_id):
     """
     Return all messages for the given emergency request in ascending time order.
-    
-    Returns:
-        JSON: {
-            'messages': [
-                {
-                    'id': int,
-                    'request_id': int,
-                    'sender_id': int,
-                    'sender_name': str,
-                    'content': str,
-                    'timestamp': str (ISO 8601)
-                },
-                ...
-            ]
-        }, 200
-    
-    Errors:
-        500: Database failure
+    Requires caller to be either the requester or the assigned helper.
     """
+    current_user_id = get_jwt_identity()
+    try:
+        current_user_id = int(current_user_id)
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Invalid user identity'}), 401
+
+    emergency = EmergencyRequest.query.get(request_id)
+    if not emergency:
+        return jsonify({'error': 'Emergency request not found'}), 404
+
+    # Security: Ensure only the requester or assigned helper can access message history
+    if current_user_id != emergency.requester_id and current_user_id != emergency.helper_id:
+        return jsonify({'error': 'Forbidden: You are not authorized to view messages for this request'}), 403
+
     try:
         # Query request messages oldest-first so chat renders in natural order
         messages = (

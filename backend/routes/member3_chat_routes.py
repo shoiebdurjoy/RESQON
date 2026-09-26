@@ -83,7 +83,7 @@ def send_chat_message():
         db.session.add(msg)
         db.session.commit()
         
-        # Emit real-time socket event for connected clients
+        # Emit real-time socket event scoped strictly to this request room
         socketio.emit('receive_message', {
             'id': msg.id,
             'request_id': msg.request_id,
@@ -91,7 +91,7 @@ def send_chat_message():
             'sender_name': sender.name,
             'content': msg.content,
             'timestamp': msg.timestamp.isoformat(),
-        })
+        }, to=f'request_{msg.request_id}')
         
         return jsonify({
             'message': 'Message sent successfully',

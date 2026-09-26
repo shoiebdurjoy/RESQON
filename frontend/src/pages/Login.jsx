@@ -24,7 +24,7 @@ export default function Login() {
       <div className="hidden lg:flex slide-left" style={{ width: '42%', background: '#0D0C0A', borderRight: '1px solid #1E1D1A', flexDirection: 'column', justifyContent: 'space-between', padding: '3rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <Zap size={20} style={{ color: '#D93B2B' }} strokeWidth={2.5} />
-          <span style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 800, fontSize: '1.125rem', letterSpacing: '-0.02em', color: '#D93B2B' }}>EMERGON</span>
+          <span style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 800, fontSize: '1.125rem', letterSpacing: '-0.02em', color: '#D93B2B' }}>RESQON</span>
         </div>
         <div>
           <p style={{ fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#353230', marginBottom: '1.25rem' }}>Emergency Response Platform</p>
@@ -35,7 +35,7 @@ export default function Login() {
             A mission-critical platform connecting people in crisis with available helpers in real time.
           </p>
         </div>
-        <p style={{ fontSize: '0.75rem', color: '#353230', fontFamily: "'Sora', sans-serif" }}>Smart Emergency System · CSE471</p>
+        <p style={{ fontSize: '0.75rem', color: '#353230', fontFamily: "'Sora', sans-serif" }}>RESQON Emergency Coordination System</p>
       </div>
 
       {/* Right panel — light */}
@@ -43,7 +43,7 @@ export default function Login() {
         <div className="slide-right" style={{ width: '100%', maxWidth: 400 }}>
           <div className="flex lg:hidden" style={{ alignItems: 'center', gap: '0.4rem', marginBottom: '2rem' }}>
             <Zap size={18} style={{ color: '#D93B2B' }} strokeWidth={2.5} />
-            <span style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 800, fontSize: '1rem', color: '#D93B2B' }}>EMERGON</span>
+            <span style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 800, fontSize: '1rem', color: '#D93B2B' }}>RESQON</span>
           </div>
           <p style={{ fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#8A8878', marginBottom: '0.5rem' }}>Sign in</p>
           <h2 style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 800, fontSize: '1.75rem', letterSpacing: '-0.025em', color: '#0D0C0A', marginBottom: '2rem', lineHeight: 1.15 }}>Welcome back</h2>

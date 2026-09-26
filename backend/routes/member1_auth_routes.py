@@ -77,6 +77,9 @@ def register():
             'error': 'Missing required fields',
             'required': ['name', 'email', 'password', 'role', 'phone']
         }), 400
+
+    if len(name) < 2 or len(name) > 100:
+        return jsonify({'error': 'Name must be between 2 and 100 characters'}), 400
     
     if not validate_email(email):
         return jsonify({'error': 'Invalid email format'}), 400

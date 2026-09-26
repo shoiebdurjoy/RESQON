@@ -42,7 +42,7 @@ export default function Register() {
       <div className="hidden lg:flex slide-left" style={{ width: '42%', flexShrink: 0, flexDirection: 'column', justifyContent: 'space-between', background: '#0D0C0A', borderRight: '1px solid #1E1D1A', padding: '3rem 3.5rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <Zap size={20} style={{ color: '#D93B2B' }} strokeWidth={2.5} />
-          <span style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 800, fontSize: '1.125rem', letterSpacing: '-0.02em', color: '#D93B2B' }}>EMERGON</span>
+          <span style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 800, fontSize: '1.125rem', letterSpacing: '-0.02em', color: '#D93B2B' }}>RESQON</span>
         </div>
         <div>
           <p style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 800, fontSize: 'clamp(2.5rem,4vw,3.5rem)', lineHeight: 1.05, letterSpacing: '-0.03em', color: '#F0EFE9', marginBottom: '1.5rem' }}>
@@ -60,7 +60,7 @@ export default function Register() {
             ))}
           </div>
         </div>
-        <p style={{ fontSize: '0.75rem', color: '#353230' }}>CSE471 Assignment — BRAC University</p>
+        <p style={{ fontSize: '0.75rem', color: '#353230' }}>RESQON Emergency Coordination System</p>
       </div>
 
       {/* Right — form (light) */}
@@ -68,7 +68,7 @@ export default function Register() {
         <div className="slide-right" style={{ width: '100%', maxWidth: 440, paddingBottom: '2rem' }}>
           <div className="flex lg:hidden" style={{ alignItems: 'center', gap: '0.375rem', marginBottom: '2rem' }}>
             <Zap size={17} style={{ color: '#D93B2B' }} strokeWidth={2.5} />
-            <span style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 800, fontSize: '1.0625rem', color: '#D93B2B' }}>EMERGON</span>
+            <span style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 800, fontSize: '1.0625rem', color: '#D93B2B' }}>RESQON</span>
           </div>
           <h1 style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 800, fontSize: '1.75rem', letterSpacing: '-0.025em', color: '#0D0C0A', marginBottom: '0.375rem', lineHeight: 1.1 }}>Create account</h1>
           <p style={{ fontSize: '0.875rem', color: '#8A8878', marginBottom: '2rem' }}>Join as a requester or register as a helper.</p>

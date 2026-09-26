@@ -56,6 +56,35 @@ def register_events(socketio):
             emit('error', {'error': 'request_id must be an integer'})
             return
 
+        emergency = EmergencyRequest.query.get(request_id)
+        if not emergency:
+            emit('error', {'error': 'Emergency request not found'})
+            return
+
+        # Authenticate socket user if JWT token is provided via auth handshake or payload
+        token = None
+        auth_data = getattr(request, 'auth', None)
+        if isinstance(auth_data, dict):
+            token = auth_data.get('token')
+        if not token and isinstance(data, dict):
+            token = data.get('token')
+        if not token:
+            auth_header = request.headers.get('Authorization', '')
+            if auth_header.startswith('Bearer '):
+                token = auth_header.split(' ')[1]
+
+        if token:
+            try:
+                from flask_jwt_extended import decode_token
+                payload = decode_token(token)
+                user_id = int(payload.get('sub'))
+                # Only requester and assigned helper are allowed in the room
+                if user_id != emergency.requester_id and user_id != emergency.helper_id:
+                    emit('error', {'error': 'Forbidden: Not a participant in this emergency'})
+                    return
+            except Exception:
+                pass
+
         # Build room name convention used across events.
         room = f'request_{request_id}'
 

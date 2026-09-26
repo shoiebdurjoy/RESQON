@@ -146,11 +146,20 @@ def create_emergency_request():
     except (TypeError, ValueError):
         return jsonify({'error': 'latitude and longitude must be numeric'}), 400
     
+    if not (-90.0 <= latitude <= 90.0) or not (-180.0 <= longitude <= 180.0):
+        return jsonify({'error': 'Coordinates out of valid range (-90 to 90 lat, -180 to 180 lng)'}), 400
+
+    description = str(data.get('description')).strip()
+    if len(description) < 5:
+        return jsonify({'error': 'Description must be at least 5 characters long'}), 400
+    if len(description) > 2000:
+        return jsonify({'error': 'Description cannot exceed 2000 characters'}), 400
+    
     # Create emergency request with PENDING status
     emergency = EmergencyRequest(
         requester_id=g.current_requester.id,
         emergency_type=emergency_type,
-        description=str(data.get('description')).strip(),
+        description=description,
         urgency_level=urgency_level,
         status=EmergencyStatus.PENDING,
         latitude=latitude,

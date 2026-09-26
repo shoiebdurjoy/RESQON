@@ -189,10 +189,17 @@ def list_available_helpers():
     
     helper_list = []
     for helper in helpers:
+        raw_phone = helper.phone or ''
+        # Mask phone to prevent public automated scraping: e.g. +88017****4739
+        if len(raw_phone) > 6:
+            masked_phone = raw_phone[:4] + '*' * max(len(raw_phone) - 7, 3) + raw_phone[-3:]
+        else:
+            masked_phone = '***-***'
+
         helper_list.append({
             'id': helper.id,
             'name': helper.name,
-            'phone': helper.phone,
+            'phone': masked_phone,
             'blood_group': helper.blood_group,
             'skills': helper.skills.split(',') if helper.skills else [],
             'latitude': None,
