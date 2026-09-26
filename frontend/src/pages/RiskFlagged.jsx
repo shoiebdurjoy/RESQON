@@ -142,8 +142,8 @@ export default function RiskFlagged() {
   }, [token]);
 
   const tabs = [
-    { key: 'flagged', label: 'High-Risk Flagged',  icon: ShieldAlert, count: flagged.length },
-    { key: 'sorted',  label: 'Sorted by Priority', icon: ArrowUpDown,  count: sorted.length  },
+    { key: 'flagged', label: 'Critical Priority Incidents', icon: ShieldAlert, count: flagged.length },
+    { key: 'sorted',  label: 'Stratified Incident Queue',   icon: ArrowUpDown,  count: sorted.length  },
   ];
   const activeList = activeTab === 'flagged' ? flagged : sorted;
 
@@ -154,10 +154,10 @@ export default function RiskFlagged() {
       <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1rem', marginBottom: '1.5rem' }}>
         <div>
           <h1 style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 800, fontSize: '1.75rem', letterSpacing: '-0.025em', color: '#0D0C0A', lineHeight: 1.15 }}>
-            Risk Flagging System
+            Risk Stratification & Priority Triage
           </h1>
           <p style={{ fontSize: '0.875rem', color: '#5A5850', marginTop: '0.375rem' }}>
-            Detects high-risk emergencies based on urgency, delay, and helper availability.
+            Automated risk scoring and priority triage queue based on clinical urgency, elapsed latency, and available field units.
           </p>
         </div>
 
@@ -165,7 +165,7 @@ export default function RiskFlagged() {
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#EBF2FC', border: '1px solid #B4CFF0', borderRadius: 6, padding: '0.5rem 0.875rem' }}>
             <Users size={14} style={{ color: '#1854B4' }} />
             <span style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 800, fontSize: '1.25rem', color: '#0D0C0A', lineHeight: 1 }}>{availableHelpers}</span>
-            <span style={{ fontSize: '0.75rem', color: '#5A5850' }}>helpers online</span>
+            <span style={{ fontSize: '0.75rem', color: '#5A5850' }}>field units on duty</span>
           </div>
           <button onClick={load} disabled={loading}
             style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.75rem', fontWeight: 600, color: '#5A5850', background: 'transparent', border: '1px solid #D0CEC4', borderRadius: 6, padding: '0.3rem 0.75rem', cursor: 'pointer', fontFamily: "'Sora', sans-serif" }}>
@@ -178,9 +178,9 @@ export default function RiskFlagged() {
       {/* Risk legend */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1.25rem' }}>
         {[
-          { label: 'Risk 7+',  desc: 'Critical',  bg: '#FEF3F1', border: '#F5C4BE', color: '#B02E20' },
-          { label: 'Risk 5–6', desc: 'High',      bg: '#FDF6E8', border: '#E8D090', color: '#9A5E08' },
-          { label: 'Risk 4',   desc: 'Elevated',  bg: '#F7F6F1', border: '#D0CEC4', color: '#5A5850' },
+          { label: 'Risk 7+',  desc: 'Critical Risk (P1)', bg: '#FEF3F1', border: '#F5C4BE', color: '#B02E20' },
+          { label: 'Risk 5–6', desc: 'High Risk (P2)',     bg: '#FDF6E8', border: '#E8D090', color: '#9A5E08' },
+          { label: 'Risk 4',   desc: 'Elevated Risk (P3)', bg: '#F7F6F1', border: '#D0CEC4', color: '#5A5850' },
         ].map(({ label, desc, bg, border, color }) => (
           <span key={label} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.75rem', fontWeight: 600, color, background: bg, border: `1px solid ${border}`, borderRadius: 4, padding: '0.2rem 0.625rem' }}>
             {label} — {desc}

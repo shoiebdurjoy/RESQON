@@ -81,18 +81,18 @@ export default function NotificationHistory() {
       {/* Page header */}
       <div style={{ marginBottom: '2rem' }}>
         <h1 style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 800, fontSize: '1.75rem', letterSpacing: '-0.025em', color: '#0D0C0A', lineHeight: 1.15, marginBottom: '0.375rem' }}>
-          Activity History
+          Incident Audit Trail & History
         </h1>
         <p style={{ fontSize: '0.875rem', color: '#5A5850' }}>
-          Review all your emergency requests, timelines, and chat history.
+          Comprehensive operational audit trail of incident dispatches, response milestones, and tactical communications.
         </p>
 
         {!isLoading && history.length > 0 && (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.625rem', marginTop: '1rem' }}>
             {[
-              { icon: <Bell size={11} />,        label: `${history.length} total`,  color: '#2E2D2A', bg: '#F7F6F1', border: '#D0CEC4' },
-              { icon: <CheckCircle2 size={11} />, label: `${completed} completed`,   color: '#15663E', bg: '#EDF8F2', border: '#A8DCBC' },
-              { icon: <XCircle size={11} />,      label: `${cancelled} cancelled`,   color: '#B02E20', bg: '#FEF3F1', border: '#F5C4BE' },
+              { icon: <Bell size={11} />,        label: `${history.length} total logged`, color: '#2E2D2A', bg: '#F7F6F1', border: '#D0CEC4' },
+              { icon: <CheckCircle2 size={11} />, label: `${completed} resolved`,         color: '#15663E', bg: '#EDF8F2', border: '#A8DCBC' },
+              { icon: <XCircle size={11} />,      label: `${cancelled} aborted`,          color: '#B02E20', bg: '#FEF3F1', border: '#F5C4BE' },
             ].map(({ icon, label, color, bg, border }) => (
               <span key={label} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.75rem', fontWeight: 600, color, background: bg, border: `1px solid ${border}`, borderRadius: 4, padding: '0.2rem 0.625rem' }}>
                 {icon} {label}
@@ -113,8 +113,8 @@ export default function NotificationHistory() {
       {!isLoading && !history.length && (
         <div className="fade-in" style={{ border: '1px dashed #D0CEC4', borderRadius: 10, background: '#F7F6F1', padding: '4rem 1.5rem', textAlign: 'center' }}>
           <p style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>📂</p>
-          <p style={{ fontWeight: 700, fontSize: '0.9375rem', color: '#2E2D2A', marginBottom: '0.25rem' }}>No history yet</p>
-          <p style={{ fontSize: '0.8125rem', color: '#8A8878' }}>Your accepted and completed requests will appear here.</p>
+          <p style={{ fontWeight: 700, fontSize: '0.9375rem', color: '#2E2D2A', marginBottom: '0.25rem' }}>No Incident Records Logged</p>
+          <p style={{ fontSize: '0.8125rem', color: '#8A8878' }}>Dispatched and resolved incident logs will appear here once recorded.</p>
         </div>
       )}
 
@@ -154,7 +154,7 @@ export default function NotificationHistory() {
                     <div>
                       <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
                         <span style={{ fontWeight: 700, fontSize: '0.9375rem', color: '#0D0C0A', textTransform: 'capitalize' }}>
-                          {request.emergency_type || 'Emergency'}
+                          {request.emergency_type || 'Incident'}
                         </span>
                         <span style={{ fontSize: '0.75rem', color: '#8A8878' }}>#{request.id}</span>
                         <span className={STATUS_BADGE[status] || 'badge-pending'}>{request.status}</span>
@@ -166,16 +166,16 @@ export default function NotificationHistory() {
                   </div>
                   <Link to={`/emergency/${request.id}`} className="btn-primary"
                     style={{ padding: '0.35rem 0.875rem', fontSize: '0.75rem', textDecoration: 'none', flexShrink: 0 }}>
-                    Open →
+                    Incident File →
                   </Link>
                 </div>
 
                 {/* Timeline cells */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '0.5rem', marginBottom: '0.875rem' }}>
                   {[
-                    { label: 'Created',  time: timeline.created_at,   icon: '📋' },
-                    { label: 'Accepted', time: timeline.accepted_at,  icon: '✅' },
-                    { label: status === 'cancelled' ? 'Cancelled' : 'Completed', time: timeline.completed_at, icon: status === 'cancelled' ? '❌' : '🎉' },
+                    { label: 'Dispatched', time: timeline.created_at,  icon: '📋' },
+                    { label: 'Mobilized',  time: timeline.accepted_at, icon: '✅' },
+                    { label: status === 'cancelled' ? 'Aborted' : 'Resolved', time: timeline.completed_at, icon: status === 'cancelled' ? '❌' : '🎉' },
                   ].map(({ label, time, icon }) => (
                     <div key={label} style={{ background: 'rgba(255,255,255,0.7)', border: `1px solid ${cardStyle.border}`, borderRadius: 6, padding: '0.5rem 0.75rem' }}>
                       <p style={{ fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#8A8878', marginBottom: '0.2rem' }}>
@@ -193,14 +193,14 @@ export default function NotificationHistory() {
                   <MessageSquare size={13} style={{ color: messages.length ? '#1854B4' : '#8A8878', flexShrink: 0, marginTop: '0.1rem' }} />
                   <div>
                     <span style={{ fontSize: '0.75rem', fontWeight: 700, color: messages.length ? '#1248A0' : '#5A5850' }}>
-                      {messages.length} message{messages.length !== 1 ? 's' : ''}
+                      {messages.length} tactical transmission{messages.length !== 1 ? 's' : ''}
                     </span>
                     {lastMsg ? (
                       <p style={{ fontSize: '0.75rem', color: '#5A5850', marginTop: '0.15rem', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                        Last: "{lastMsg.content}"
+                        Transmission: "{lastMsg.content}"
                       </p>
                     ) : (
-                      <p style={{ fontSize: '0.75rem', color: '#8A8878', marginTop: '0.1rem', fontStyle: 'italic' }}>No chat messages.</p>
+                      <p style={{ fontSize: '0.75rem', color: '#8A8878', marginTop: '0.1rem', fontStyle: 'italic' }}>No tactical transmissions logged.</p>
                     )}
                   </div>
                 </div>

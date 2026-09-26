@@ -5,9 +5,9 @@ function formatTimestamp(value) {
 }
 
 const STEPS = [
-  { key: 'created_at',   label: 'Request Created', dotColor: '#D0CEC4', activeColor: '#1854B4' },
-  { key: 'accepted_at',  label: 'Helper Accepted',  dotColor: '#D0CEC4', activeColor: '#1A7F4E' },
-  { key: 'completed_at', label: 'Completed',         dotColor: '#D0CEC4', activeColor: '#1A7F4E' },
+  { key: 'created_at',   label: 'Incident Logged',          dotColor: '#D0CEC4', activeColor: '#1854B4' },
+  { key: 'accepted_at',  label: 'Response Unit Mobilized',  dotColor: '#D0CEC4', activeColor: '#1A7F4E' },
+  { key: 'completed_at', label: 'Incident Resolved',        dotColor: '#D0CEC4', activeColor: '#1A7F4E' },
 ];
 
 export default function StatusTimeline({ request }) {
@@ -18,13 +18,13 @@ export default function StatusTimeline({ request }) {
   const steps = isCancelled
     ? [
         ...STEPS.slice(0, 2),
-        { key: 'completed_at', label: 'Cancelled', dotColor: '#D0CEC4', activeColor: '#D93B2B' },
+        { key: 'completed_at', label: 'Dispatch Aborted / Stand Down', dotColor: '#D0CEC4', activeColor: '#D93B2B' },
       ]
     : STEPS;
 
   return (
     <div className="card" style={{ padding: '1.25rem 1.5rem' }}>
-      <p style={{ fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#8A8878', marginBottom: '1rem' }}>Status Timeline</p>
+      <p style={{ fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#8A8878', marginBottom: '1rem' }}>Incident Lifecycle Timeline</p>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
         {steps.map((step, i) => {
           const ts   = formatTimestamp(request[step.key]);
@@ -56,7 +56,7 @@ export default function StatusTimeline({ request }) {
                 <p style={{ fontSize: '0.875rem', fontWeight: 700, color: done ? '#0D0C0A' : '#8A8878', marginBottom: '0.15rem' }}>{step.label}</p>
                 {ts
                   ? <p style={{ fontSize: '0.75rem', color: '#5A5850' }}>{ts}</p>
-                  : <p style={{ fontSize: '0.75rem', color: '#D0CEC4', fontStyle: 'italic' }}>Not yet reached</p>}
+                  : <p style={{ fontSize: '0.75rem', color: '#D0CEC4', fontStyle: 'italic' }}>Pending Progression</p>}
               </div>
             </div>
           );

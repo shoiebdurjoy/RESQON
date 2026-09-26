@@ -74,8 +74,11 @@ export default function AnalyticsDashboard() {
       {/* Header — Task G: removed "Member 1 · Module 3" */}
       <div style={{ marginBottom: '2rem' }}>
         <h1 style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 800, fontSize: '1.75rem', letterSpacing: '-0.025em', color: '#0D0C0A', lineHeight: 1.15 }}>
-          Interactive Dashboard
+          Command Analytics & Performance Metrics
         </h1>
+        <p style={{ fontSize: '0.875rem', color: '#5A5850', marginTop: '0.375rem' }}>
+          Real-time dispatch KPIs, response latency benchmarks, and resource utilization metrics.
+        </p>
       </div>
 
       {/* Loading */}
@@ -101,10 +104,10 @@ export default function AnalyticsDashboard() {
         <>
           {/* Stats — Task D: bigger labels */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.875rem', marginBottom: '1.5rem' }}>
-            <StatCard label="Active Emergencies" value={s.total_active}        icon={<AlertTriangle size={20} />} accent="#C4780A" subtitle="Pending + accepted"  animDelay={0}   />
-            <StatCard label="Available Helpers"  value={s.available_helpers}   icon={<Users size={20} />}         accent="#1854B4" subtitle="Online now"          animDelay={65}  />
-            <StatCard label="Completed"          value={s.completed_requests}  icon={<CheckCircle2 size={20} />}  accent="#1A7F4E" subtitle="All time"            animDelay={130} />
-            <StatCard label="Cancelled"          value={s.cancelled_requests}  icon={<XCircle size={20} />}       accent="#D93B2B" subtitle="All time"            animDelay={195} />
+            <StatCard label="Active Incidents"    value={s.total_active}        icon={<AlertTriangle size={20} />} accent="#C4780A" subtitle="Awaiting dispatch + active" animDelay={0}   />
+            <StatCard label="Available Field Units" value={s.available_helpers} icon={<Users size={20} />}         accent="#1854B4" subtitle="On duty across network"    animDelay={65}  />
+            <StatCard label="Resolved Incidents" value={s.completed_requests}  icon={<CheckCircle2 size={20} />}  accent="#1A7F4E" subtitle="Successfully concluded"    animDelay={130} />
+            <StatCard label="Aborted / Cancelled" value={s.cancelled_requests} icon={<XCircle size={20} />}       accent="#D93B2B" subtitle="Stand down orders"         animDelay={195} />
           </div>
 
           {/* Analytics row */}
@@ -113,13 +116,13 @@ export default function AnalyticsDashboard() {
             {/* Type breakdown */}
             <div className="card" style={{ padding: '1.25rem 1.5rem' }}>
               <p style={{ fontSize: '0.8125rem', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', color: '#5A5850', marginBottom: '1rem' }}>
-                Request Types
+                Incident Classification Breakdown
               </p>
               {a.most_requested_type && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
                   <span style={{ fontSize: '2rem' }}>{TYPE_ICON[a.most_requested_type] || '🆘'}</span>
                   <div>
-                    <p style={{ fontSize: '0.6875rem', color: '#8A8878', fontWeight: 600 }}>Most requested</p>
+                    <p style={{ fontSize: '0.6875rem', color: '#8A8878', fontWeight: 600 }}>Primary Incident Type</p>
                     <p style={{ fontWeight: 700, fontSize: '1rem', color: '#0D0C0A', textTransform: 'capitalize' }}>{a.most_requested_type}</p>
                   </div>
                 </div>
@@ -147,13 +150,13 @@ export default function AnalyticsDashboard() {
             {/* Completion rate */}
             <div className="card" style={{ padding: '1.25rem 1.5rem' }}>
               <p style={{ fontSize: '0.8125rem', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', color: '#5A5850', marginBottom: '1rem' }}>
-                Completion Rate
+                Incident Resolution Rate
               </p>
               <p className="num-reveal" style={{ fontFamily: "'Sora', system-ui, sans-serif", fontWeight: 800, fontSize: '3.25rem', letterSpacing: '-0.03em', color: '#1A7F4E', lineHeight: 1, marginBottom: '0.5rem' }}>
                 {animCompletion}<span style={{ fontSize: '1.5rem', color: '#8A8878' }}>%</span>
               </p>
               <p style={{ fontSize: '0.8125rem', color: '#5A5850', marginBottom: '1rem', lineHeight: 1.5 }}>
-                Of all non-cancelled requests resolved successfully.
+                Percentage of active dispatches brought to successful operational resolution.
               </p>
               <div className="progress-track" style={{ height: 8 }}>
                 <div className="progress-fill progress-green anim-bar" style={{ width: `${Math.min(a.completion_rate || 0, 100)}%`, height: 8 }} />
@@ -163,7 +166,7 @@ export default function AnalyticsDashboard() {
             {/* Avg response time */}
             <div className="card" style={{ padding: '1.25rem 1.5rem' }}>
               <p style={{ fontSize: '0.8125rem', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', color: '#5A5850', marginBottom: '1rem' }}>
-                Avg Response Time
+                Mean Response Latency
               </p>
               {a.avg_response_time_minutes != null ? (
                 <>
@@ -172,7 +175,7 @@ export default function AnalyticsDashboard() {
                     <span style={{ fontSize: '1.25rem', fontWeight: 600, color: '#8A8878' }}> min</span>
                   </p>
                   <p style={{ fontSize: '0.8125rem', color: '#5A5850', lineHeight: 1.5 }}>
-                    From request creation to helper acceptance.
+                    Elapsed duration from initial emergency dispatch to field unit mobilization.
                   </p>
                   <div style={{ marginTop: '1rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.75rem', fontWeight: 600,
                     color:       a.avg_response_time_minutes <= 10 ? '#15663E' : a.avg_response_time_minutes <= 30 ? '#9A5E08' : '#B02E20',
@@ -180,11 +183,11 @@ export default function AnalyticsDashboard() {
                     borderRadius: 4, padding: '0.2rem 0.625rem',
                     border: `1px solid ${a.avg_response_time_minutes <= 10 ? '#A8DCBC' : a.avg_response_time_minutes <= 30 ? '#E8D090' : '#F5C4BE'}` }}>
                     <Clock3 size={11} />
-                    {a.avg_response_time_minutes <= 10 ? 'Excellent' : a.avg_response_time_minutes <= 30 ? 'Good' : 'Needs improvement'}
+                    {a.avg_response_time_minutes <= 10 ? 'Optimal Response Time' : a.avg_response_time_minutes <= 30 ? 'Acceptable Window' : 'Latency Alert'}
                   </div>
                 </>
               ) : (
-                <p style={{ fontSize: '0.8125rem', color: '#8A8878', fontStyle: 'italic' }}>No accepted requests yet.</p>
+                <p style={{ fontSize: '0.8125rem', color: '#8A8878', fontStyle: 'italic' }}>No mobilized response records yet.</p>
               )}
             </div>
           </div>
@@ -194,7 +197,7 @@ export default function AnalyticsDashboard() {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <Activity size={15} style={{ color: '#8A8878' }} />
-                <p style={{ fontWeight: 700, fontSize: '0.9375rem', color: '#0D0C0A' }}>Recent Activity</p>
+                <p style={{ fontWeight: 700, fontSize: '0.9375rem', color: '#0D0C0A' }}>Operational Event Stream</p>
               </div>
               <span style={{ fontSize: '0.75rem', color: '#8A8878' }}>{activities.length} records</span>
             </div>

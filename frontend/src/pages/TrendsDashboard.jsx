@@ -92,10 +92,10 @@ export default function TrendsDashboard() {
       {/* Header — Task G: removed "Member 3 · Module 3" */}
       <div style={{ marginBottom: '2rem' }}>
         <h1 style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 800, fontSize: '1.75rem', letterSpacing: '-0.025em', color: '#0D0C0A', lineHeight: 1.15 }}>
-          Trends & Timeline
+          Operational Trends & Incident Lifecycle Audit
         </h1>
         <p style={{ fontSize: '0.875rem', color: '#5A5850', marginTop: '0.375rem' }}>
-          Track emergency demand over 30 days and inspect per-request status timelines.
+          30-day temporal incident demand curves, surge detection, and lifecycle timeline auditing.
         </p>
       </div>
 
@@ -104,7 +104,7 @@ export default function TrendsDashboard() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
           <TrendingUp size={15} style={{ color: '#8A8878' }} />
           <p style={{ fontWeight: 700, fontSize: '0.9375rem', color: '#0D0C0A' }}>
-            Emergency Type Trends — Last 30 Days
+            Incident Classification Trends — 30-Day Window
           </p>
         </div>
 
@@ -132,12 +132,12 @@ export default function TrendsDashboard() {
                       <span style={{ fontSize: '1.25rem' }}>{TYPE_ICON[type] || '🆘'}</span>
                       {isHigh && (
                         <span style={{ fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', background: '#D93B2B', color: '#fff', borderRadius: 3, padding: '0.15rem 0.45rem' }}>
-                          Peak
+                          Surge Peak
                         </span>
                       )}
                     </div>
                     <p style={{ fontFamily: "'Sora', system-ui, sans-serif", fontWeight: 800, fontSize: '2rem', letterSpacing: '-0.02em', color: bar, lineHeight: 1 }}>{count}</p>
-                    <p style={{ fontSize: '0.75rem', color: '#5A5850', marginTop: '0.25rem' }}>{TYPE_LABEL[type] || type} requests</p>
+                    <p style={{ fontSize: '0.75rem', color: '#5A5850', marginTop: '0.25rem' }}>{TYPE_LABEL[type] || type} incidents logged</p>
                   </div>
                 );
               })}
@@ -182,15 +182,15 @@ export default function TrendsDashboard() {
       <div className="card" style={{ padding: '1.5rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.375rem' }}>
           <CheckCircle2 size={15} style={{ color: '#8A8878' }} />
-          <p style={{ fontWeight: 700, fontSize: '0.9375rem', color: '#0D0C0A' }}>Request Status Timeline</p>
+          <p style={{ fontWeight: 700, fontSize: '0.9375rem', color: '#0D0C0A' }}>Incident Lifecycle Audit Trail</p>
         </div>
         <p style={{ fontSize: '0.8125rem', color: '#5A5850', marginBottom: '1.25rem' }}>
-          Enter a Request ID to view its complete lifecycle — creation, acceptance, and completion.
+          Enter an Incident ID to reconstruct its operational lifecycle — dispatch, mobilization, and resolution.
         </p>
 
         {/* Search */}
         <div style={{ display: 'flex', gap: '0.625rem', marginBottom: '1.25rem' }}>
-          <input type="number" min="1" placeholder="Request ID (e.g. 42)" value={requestId}
+          <input type="number" min="1" placeholder="Incident ID (e.g. 42)" value={requestId}
             onChange={e => setRequestId(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && fetchTimeline()}
             className="input-field" style={{ maxWidth: 220, fontSize: '0.875rem' }} />
@@ -199,7 +199,7 @@ export default function TrendsDashboard() {
             {timelineLoading
               ? <span style={{ width: 14, height: 14, borderRadius: '50%', border: '2px solid #D0CEC4', borderTopColor: '#8A8878', animation: 'spin 0.7s linear infinite', display: 'inline-block' }} />
               : <Search size={13} />}
-            {timelineLoading ? 'Loading…' : 'Fetch Timeline'}
+            {timelineLoading ? 'Loading…' : 'Inspect Lifecycle'}
           </button>
         </div>
 
@@ -212,10 +212,10 @@ export default function TrendsDashboard() {
             {/* Meta */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.5rem' }}>
               {[
-                { label: 'Request ID',     value: `#${timeline.request_id}` },
+                { label: 'Incident ID',   value: `#${timeline.request_id}` },
                 { label: 'Type',           value: `${TYPE_ICON[timeline.emergency_type] || '🆘'} ${TYPE_LABEL[timeline.emergency_type] || timeline.emergency_type}` },
                 { label: 'Urgency',        value: timeline.urgency_level },
-                { label: 'Total Duration', value: timeline.total_duration_minutes != null ? `${timeline.total_duration_minutes} min` : '—' },
+                { label: 'Mission Duration', value: timeline.total_duration_minutes != null ? `${timeline.total_duration_minutes} min` : '—' },
               ].map(({ label, value }) => (
                 <div key={label} style={{ background: '#F7F6F1', border: '1px solid #E4E2DA', borderRadius: 6, padding: '0.625rem 0.875rem' }}>
                   <p style={{ fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#8A8878', marginBottom: '0.2rem' }}>{label}</p>

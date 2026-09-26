@@ -47,15 +47,15 @@ export default function ChatBox({ requestId, token, currentUserId }) {
       {/* Header */}
       <div style={{ padding: '0.875rem 1.125rem', borderBottom: '1px solid #E4E2DA', display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
         <span className="live-dot" />
-        <p style={{ fontWeight: 700, fontSize: '0.9375rem', color: '#0D0C0A' }}>Live Chat</p>
-        <span style={{ fontSize: '0.75rem', color: '#8A8878', marginLeft: 'auto' }}>{messages.length} message{messages.length !== 1 ? 's' : ''}</span>
+        <p style={{ fontWeight: 700, fontSize: '0.9375rem', color: '#0D0C0A' }}>Tactical Comms Channel</p>
+        <span style={{ fontSize: '0.75rem', color: '#8A8878', marginLeft: 'auto' }}>{messages.length} transmission{messages.length !== 1 ? 's' : ''}</span>
       </div>
 
       {/* Messages */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '1rem 1.125rem', display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
         {!messages.length && (
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <p style={{ fontSize: '0.8125rem', color: '#D0CEC4', fontStyle: 'italic' }}>No messages yet. Start the conversation.</p>
+            <p style={{ fontSize: '0.8125rem', color: '#D0CEC4', fontStyle: 'italic' }}>Channel established. No tactical transmissions recorded.</p>
           </div>
         )}
         {messages.map((msg, i) => {
@@ -63,7 +63,7 @@ export default function ChatBox({ requestId, token, currentUserId }) {
           return (
             <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: isOwn ? 'flex-end' : 'flex-start' }}>
               <p style={{ fontSize: '0.6875rem', color: '#8A8878', marginBottom: '0.2rem', fontWeight: 600 }}>
-                {isOwn ? 'You' : (msg.sender_name || 'Helper')}
+                {isOwn ? 'You' : (msg.sender_name || 'Assigned Unit')}
               </p>
               <div style={{
                 maxWidth: '78%', padding: '0.5625rem 0.875rem',
@@ -89,7 +89,7 @@ export default function ChatBox({ requestId, token, currentUserId }) {
         <input
           value={draft} onChange={e => setDraft(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage()}
-          placeholder="Type a message…" className="input-field"
+          placeholder="Transmit operational update or message…" className="input-field"
           style={{ flex: 1, fontSize: '0.875rem' }}
         />
         <button onClick={sendMessage} disabled={sending || !draft.trim()}

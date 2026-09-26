@@ -114,12 +114,12 @@ function EmergencyCard({ item, onAccept, onReject, onComplete, onCancel, current
               <p style={{ fontWeight: 700, fontSize: '0.9375rem', color: '#0D0C0A', lineHeight: 1.2, textTransform: 'capitalize' }}>{item.emergency_type}</p>
               {isOwner && (
                 <span style={{ fontSize: '0.625rem', fontWeight: 700, color: '#1854B4', background: '#EBF2FC', padding: '0.1rem 0.4rem', borderRadius: 4, textTransform: 'uppercase' }}>
-                  Mine
+                  Reporting Party
                 </span>
               )}
               {isAssigned && (
                 <span style={{ fontSize: '0.625rem', fontWeight: 700, color: '#15663E', background: '#EDF8F2', padding: '0.1rem 0.4rem', borderRadius: 4, textTransform: 'uppercase' }}>
-                  Assigned
+                  Assigned Unit
                 </span>
               )}
             </div>
@@ -164,7 +164,7 @@ function EmergencyCard({ item, onAccept, onReject, onComplete, onCancel, current
               borderRadius: 6, textDecoration: 'none'
             }}
           >
-            <PhoneCall size={11} /> Call {contactPhone}
+            <PhoneCall size={11} /> Direct Comms: {contactPhone}
           </a>
         </div>
       )}
@@ -173,7 +173,7 @@ function EmergencyCard({ item, onAccept, onReject, onComplete, onCancel, current
       <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', flexWrap: 'wrap' }}>
         <Link to={`/emergency/${item.id}`}
           style={{ display: 'inline-flex', alignItems: 'center', gap: '0.2rem', fontSize: '0.8125rem', fontWeight: 600, color: '#D93B2B', textDecoration: 'none' }}>
-          View details <ChevronRight size={13} />
+          Incident File <ChevronRight size={13} />
         </Link>
 
         <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
@@ -181,11 +181,11 @@ function EmergencyCard({ item, onAccept, onReject, onComplete, onCancel, current
             <>
               <button onClick={() => onAccept(item.id)} disabled={actionLoading[`accept-${item.id}`]} className="btn-primary"
                 style={{ padding: '0.3rem 0.75rem', fontSize: '0.75rem' }}>
-                {actionLoading[`accept-${item.id}`] ? 'Accepting…' : 'Accept & Help'}
+                {actionLoading[`accept-${item.id}`] ? 'Mobilizing…' : 'Acknowledge & Mobilize'}
               </button>
               <button onClick={() => onReject(item.id)} disabled={actionLoading[`reject-${item.id}`]} className="btn-ghost"
                 style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem' }}>
-                Pass
+                Stand Down
               </button>
             </>
           )}
@@ -193,14 +193,14 @@ function EmergencyCard({ item, onAccept, onReject, onComplete, onCancel, current
           {canComplete && (
             <button onClick={() => onComplete(item.id)} disabled={actionLoading[`complete-${item.id}`]} className="btn-success"
               style={{ padding: '0.3rem 0.75rem', fontSize: '0.75rem' }}>
-              {actionLoading[`complete-${item.id}`] ? '…' : 'Complete'}
+              {actionLoading[`complete-${item.id}`] ? '…' : 'Resolve Incident'}
             </button>
           )}
 
           {canCancel && (
             <button onClick={() => onCancel(item.id)} disabled={actionLoading[`cancel-${item.id}`]} className="btn-danger"
               style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem' }}>
-              {actionLoading[`cancel-${item.id}`] ? '…' : isOwner ? 'Cancel' : 'Withdraw'}
+              {actionLoading[`cancel-${item.id}`] ? '…' : isOwner ? 'Abort Dispatch' : 'Withdraw Unit'}
             </button>
           )}
         </div>
@@ -322,7 +322,7 @@ export default function Dashboard() {
 
   const handleAccept = (id) => doAction(`accept-${id}`, async () => {
     await axios.put(`${API_URL}/emergency/${id}/accept`, {}, { headers: authHeaders });
-    toast.success('Accepted! You are now assisting this emergency.');
+    toast.success('Unit mobilized. Incident status updated to active response.');
     await Promise.all([fetchCommunityRequests(), fetchMyRequests()]);
   });
 
@@ -332,16 +332,16 @@ export default function Dashboard() {
   });
 
   const handleComplete = (id) => doAction(`complete-${id}`, async () => {
-    const note = window.prompt('Optional: Enter resolution summary (e.g. medical transport complete, blood donation done):');
+    const note = window.prompt('Optional: Enter incident resolution summary (e.g. medical transport complete, patient transferred to care):');
     const payload = (note !== null && note.trim()) ? { resolution_note: note.trim() } : {};
     await axios.put(`${API_URL}/emergency/${id}/complete`, payload, { headers: authHeaders });
-    toast.success('Emergency marked as completed.');
+    toast.success('Incident resolved and logged into incident archive.');
     await Promise.all([fetchCommunityRequests(), fetchMyRequests()]);
   });
 
   const handleCancel = (id) => doAction(`cancel-${id}`, async () => {
     await axios.put(`${API_URL}/emergency/${id}/cancel`, {}, { headers: authHeaders });
-    toast.success('Status updated.');
+    toast.success('Incident status updated.');
     await Promise.all([fetchCommunityRequests(), fetchMyRequests()]);
   });
 
@@ -372,14 +372,14 @@ export default function Dashboard() {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.375rem' }}>
             <span style={{ fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#8A8878' }}>
-              RESQON Live Platform
+              RESQON Incident Command System
             </span>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.6875rem', fontWeight: 600, color: '#15663E', background: '#EDF8F2', border: '1px solid #A8DCBC', borderRadius: 3, padding: '0.1rem 0.5rem' }}>
-              <Wifi size={10} /> Live Network
+              <Wifi size={10} /> Tactical Network: Live
             </span>
           </div>
           <h1 style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 800, fontSize: 'clamp(1.5rem, 3vw, 2rem)', letterSpacing: '-0.025em', color: '#0D0C0A', lineHeight: 1.15 }}>
-            Emergency Coordination Dashboard
+            Incident Command Operations Center
           </h1>
         </div>
 
@@ -388,7 +388,7 @@ export default function Dashboard() {
           className="btn-primary"
           style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.6rem 1.25rem', fontSize: '0.875rem', textDecoration: 'none', boxShadow: '0 2px 8px rgba(217,59,43,0.25)' }}
         >
-          <Plus size={16} strokeWidth={2.5} /> Post Emergency
+          <Plus size={16} strokeWidth={2.5} /> Report Incident
         </Link>
       </div>
 
@@ -399,10 +399,10 @@ export default function Dashboard() {
             <span style={{ fontSize: '1.5rem' }}>🚨</span>
             <div>
               <p style={{ fontWeight: 800, fontSize: '0.875rem', color: '#D93B2B', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                Critical Emergency Alert ({criticalEmergencies.length} active)
+                Priority 1 Tactical Alert ({criticalEmergencies.length} active)
               </p>
               <p style={{ fontSize: '0.8125rem', color: '#5A5850', marginTop: '0.15rem' }}>
-                Immediate assistance requested for life-critical incidents.
+                Immediate unit mobilization requested for life-critical incidents.
               </p>
             </div>
           </div>
@@ -411,16 +411,16 @@ export default function Dashboard() {
             className="btn-primary"
             style={{ padding: '0.35rem 0.85rem', fontSize: '0.75rem', flexShrink: 0, textDecoration: 'none' }}
           >
-            Respond Now (#{criticalEmergencies[0].id})
+            Mobilize Unit (#{criticalEmergencies[0].id})
           </Link>
         </div>
       )}
 
       {/* Stats strip */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.875rem', marginBottom: '1.5rem' }}>
-        <StatCard label="Pending"   value={stats.pending}   statKey="pending"   icon={<Clock3       size={22} />} animDelay={0}   />
-        <StatCard label="Accepted"  value={stats.accepted}  statKey="accepted"  icon={<CheckCircle2 size={22} />} animDelay={70}  />
-        <StatCard label="Completed" value={stats.completed} statKey="completed" icon={<FileCheck2   size={22} />} animDelay={140} />
+        <StatCard label="Awaiting Dispatch" value={stats.pending}   statKey="pending"   icon={<Clock3       size={22} />} animDelay={0}   />
+        <StatCard label="Units Mobilized"   value={stats.accepted}  statKey="accepted"  icon={<CheckCircle2 size={22} />} animDelay={70}  />
+        <StatCard label="Resolved"          value={stats.completed} statKey="completed" icon={<FileCheck2   size={22} />} animDelay={140} />
       </div>
 
       {/* View Tabs */}
@@ -435,7 +435,7 @@ export default function Dashboard() {
             cursor: 'pointer', fontFamily: "'Sora', sans-serif"
           }}
         >
-          Community Emergency Feed ({communityRequests.length})
+          Active Incident Queue ({communityRequests.length})
         </button>
         <button
           onClick={() => setActiveTab('mine')}
@@ -447,7 +447,7 @@ export default function Dashboard() {
             cursor: 'pointer', fontFamily: "'Sora', sans-serif"
           }}
         >
-          My Requests & Tasks ({myRequests.length})
+          My Field Assignments & Incidents ({myRequests.length})
         </button>
       </div>
 
@@ -456,14 +456,14 @@ export default function Dashboard() {
         <div className="card" style={{ padding: '1rem 1.25rem', marginBottom: '1.5rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.75rem', fontSize: '0.8125rem', fontWeight: 600, color: '#2E2D2A' }}>
             <Filter size={14} style={{ color: '#8A8878' }} />
-            Filter Community Requests
+            Filter Active Incidents
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '0.625rem' }}>
             <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="input-field" style={{ fontSize: '0.8125rem' }}>
-              {[['','All Status'],['pending','Pending'],['accepted','Accepted'],['completed','Completed'],['cancelled','Cancelled']].map(([v,l]) => <option key={v} value={v}>{l}</option>)}
+              {[['','All Statuses'],['pending','Awaiting Dispatch'],['accepted','Mobilized / Active'],['completed','Resolved'],['cancelled','Cancelled']].map(([v,l]) => <option key={v} value={v}>{l}</option>)}
             </select>
             <select value={typeFilter} onChange={e => setTypeFilter(e.target.value)} className="input-field" style={{ fontSize: '0.8125rem' }}>
-              {[['','All Types'],['blood','🩸 Blood'],['ambulance','🚑 Ambulance'],['oxygen','💨 Oxygen']].map(([v,l]) => <option key={v} value={v}>{l}</option>)}
+              {[['','All Classifications'],['blood','🩸 Blood'],['ambulance','🚑 Ambulance'],['oxygen','💨 Oxygen']].map(([v,l]) => <option key={v} value={v}>{l}</option>)}
             </select>
             <input type="date" value={dateFilter} onChange={e => setDateFilter(e.target.value)} className="input-field" style={{ fontSize: '0.8125rem' }} />
           </div>
@@ -501,10 +501,10 @@ export default function Dashboard() {
         <div className="fade-in" style={{ border: '1px dashed #D0CEC4', borderRadius: 10, background: '#F7F6F1', padding: '3.5rem 1.5rem', textAlign: 'center', marginBottom: '2rem' }}>
           <Search size={28} style={{ margin: '0 auto 0.75rem', color: '#D0CEC4' }} />
           <p style={{ fontWeight: 600, color: '#5A5850', fontSize: '0.9375rem' }}>
-            {activeTab === 'community' ? 'No emergency requests matching filters' : 'You have no active emergency requests or assigned tasks'}
+            {activeTab === 'community' ? 'No active incidents match current operational criteria' : 'No active incidents reported or response units currently assigned to you'}
           </p>
           <p style={{ fontSize: '0.8125rem', color: '#8A8878', marginTop: '0.25rem' }}>
-            {activeTab === 'community' ? 'Try adjusting your filters or check back shortly.' : 'When you post an emergency or accept a task, it will appear here.'}
+            {activeTab === 'community' ? 'Adjust filter parameters or monitor tactical frequency for incoming emergency dispatches.' : 'Incidents you report or response operations you accept will appear here.'}
           </p>
         </div>
       )}

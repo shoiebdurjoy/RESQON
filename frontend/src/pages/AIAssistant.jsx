@@ -77,10 +77,10 @@ export default function AIAssistant() {
       {/* Header — Task G: removed "Member 4 · Module 3" */}
       <div style={{ marginBottom: '2rem' }}>
         <h1 style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 800, fontSize: '1.75rem', letterSpacing: '-0.025em', color: '#0D0C0A', lineHeight: 1.15 }}>
-          AI Emergency Assistant
+          AI Triage & Operations Intelligence
         </h1>
         <p style={{ fontSize: '0.875rem', color: '#5A5850', marginTop: '0.375rem' }}>
-          Generates summaries, suggests urgency levels, and surfaces performance insights.
+          Natural language incident triage, clinical urgency classification, and operational response recommendations.
         </p>
       </div>
 
@@ -88,16 +88,16 @@ export default function AIAssistant() {
       <div className="card" style={{ padding: '1.5rem', marginBottom: '1.25rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.375rem' }}>
           <BrainCircuit size={15} style={{ color: '#8A8878' }} />
-          <p style={{ fontWeight: 700, fontSize: '0.9375rem', color: '#0D0C0A' }}>AI Summary & Urgency Suggester</p>
+          <p style={{ fontWeight: 700, fontSize: '0.9375rem', color: '#0D0C0A' }}>Automated Triage & Urgency Stratification</p>
         </div>
         <p style={{ fontSize: '0.8125rem', color: '#5A5850', marginBottom: '1.25rem', lineHeight: 1.6 }}>
-          Paste or type an emergency description. The AI will generate a concise summary and recommend an urgency level.
+          Submit incident narratives or 911 dispatch transcripts. The intelligence engine generates clinical summaries and assigns priority triage levels.
         </p>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
           <textarea rows={5} value={description}
             onChange={e => setDescription(e.target.value)}
-            placeholder="e.g. My father collapsed at home, he is 68 years old and has chest pain and difficulty breathing…"
+            placeholder="e.g. Adult male collapsed on site, acute chest compression, severe respiratory distress, pulse rapid and irregular…"
             className="input-field"
             style={{ resize: 'vertical', lineHeight: 1.6, fontSize: '0.875rem' }} />
 
@@ -105,7 +105,7 @@ export default function AIAssistant() {
             <p style={{ fontSize: '0.75rem', color: '#8A8878' }}>{description.length} characters</p>
             <button onClick={handleSummarise} disabled={aiLoading || !description.trim()} className="btn-ink"
               style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 1.25rem', fontSize: '0.875rem' }}>
-              {aiLoading ? <><Loader2 size={14} style={{ animation: 'spin 0.7s linear infinite' }} /> Analysing…</> : <><Send size={14} /> Analyse with AI</>}
+              {aiLoading ? <><Loader2 size={14} style={{ animation: 'spin 0.7s linear infinite' }} /> Triaging Incident…</> : <><Send size={14} /> Execute AI Triage Analysis</>}
             </button>
           </div>
         </div>

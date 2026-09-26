@@ -160,7 +160,7 @@ export default function RequestDetails() {
         </p>
         <button onClick={() => navigate('/dashboard')} className="btn-secondary"
           style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem' }}>
-          <ArrowLeft size={14} /> Back to Dashboard
+          <ArrowLeft size={14} /> Back to Operations
         </button>
       </div>
     );
@@ -209,7 +209,7 @@ export default function RequestDetails() {
               </div>
 
               <h1 style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 800, fontSize: '1.375rem', letterSpacing: '-0.02em', color: '#0D0C0A', marginBottom: '0.375rem', lineHeight: 1.2 }}>
-                Emergency Request #{requestData.id}
+                Incident Dossier #{requestData.id}
               </h1>
               <p style={{ fontSize: '0.875rem', color: '#5A5850', lineHeight: 1.6, maxWidth: 520 }}>
                 {requestData.description}
@@ -219,7 +219,7 @@ export default function RequestDetails() {
 
           <button onClick={() => navigate('/dashboard')} className="btn-ghost"
             style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', padding: '0.375rem 0.875rem', fontSize: '0.8125rem', flexShrink: 0 }}>
-            <ArrowLeft size={13} /> Back
+            <ArrowLeft size={13} /> Return
           </button>
         </div>
 
@@ -242,7 +242,7 @@ export default function RequestDetails() {
 
         {requestData.resolution_note && (
           <div style={{ marginTop: '0.875rem', padding: '0.75rem 1rem', background: '#EDF8F2', border: '1px solid #A8DCBC', borderRadius: 8 }}>
-            <p style={{ fontSize: '0.6875rem', fontWeight: 700, color: '#15663E', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.2rem' }}>Resolution Summary</p>
+            <p style={{ fontSize: '0.6875rem', fontWeight: 700, color: '#15663E', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.2rem' }}>Incident Resolution Summary</p>
             <p style={{ fontSize: '0.8125rem', color: '#0D0C0A' }}>{requestData.resolution_note}</p>
           </div>
         )}
@@ -256,7 +256,7 @@ export default function RequestDetails() {
             <User size={18} style={{ color: '#1854B4' }} />
           </div>
           <div style={{ flex: 1 }}>
-            <p style={{ fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#8A8878', marginBottom: '0.2rem' }}>Requester</p>
+            <p style={{ fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#8A8878', marginBottom: '0.2rem' }}>Reporting Party</p>
             <p style={{ fontWeight: 700, fontSize: '0.9375rem', color: '#0D0C0A', lineHeight: 1.2 }}>{requestData.requester?.name || 'N/A'}</p>
             {requestData.requester?.phone && (
               <div style={{ marginTop: '0.35rem' }}>
@@ -283,7 +283,7 @@ export default function RequestDetails() {
             <UserCheck size={18} style={{ color: requestData.helper ? '#1A7F4E' : '#8A8878' }} />
           </div>
           <div style={{ flex: 1 }}>
-            <p style={{ fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#8A8878', marginBottom: '0.2rem' }}>Helper / Responder</p>
+            <p style={{ fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#8A8878', marginBottom: '0.2rem' }}>Assigned Response Unit</p>
             {requestData.helper ? (
               <>
                 <p style={{ fontWeight: 700, fontSize: '0.9375rem', color: '#0D0C0A', lineHeight: 1.2 }}>{requestData.helper.name}</p>
@@ -305,7 +305,7 @@ export default function RequestDetails() {
                 )}
               </>
             ) : (
-              <p style={{ fontWeight: 600, fontSize: '0.875rem', color: '#8A8878', fontStyle: 'italic' }}>Unassigned</p>
+              <p style={{ fontWeight: 600, fontSize: '0.875rem', color: '#8A8878', fontStyle: 'italic' }}>No Unit Dispatched</p>
             )}
           </div>
         </div>
@@ -315,7 +315,7 @@ export default function RequestDetails() {
       {requestData.latitude && requestData.longitude && (
         <div className="card" style={{ padding: '1.25rem', marginBottom: '1.25rem' }}>
           <p style={{ fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#8A8878', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
-            <MapPin size={12} /> Incident Location
+            <MapPin size={12} /> Incident Coordinates & Staging Area
           </p>
           <RequesterMap lat={requestData.latitude} lng={requestData.longitude} />
           <p style={{ fontSize: '0.75rem', color: '#8A8878', marginTop: '0.5rem', fontVariantNumeric: 'tabular-nums' }}>
@@ -327,29 +327,29 @@ export default function RequestDetails() {
       {/* ── Actions ──────────────────────────────────────────────────── */}
       {hasActions && (
         <div className="card" style={{ padding: '1rem 1.25rem', marginBottom: '1.25rem' }}>
-          <p style={{ fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#8A8878', marginBottom: '0.75rem' }}>Emergency Actions</p>
+          <p style={{ fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#8A8878', marginBottom: '0.75rem' }}>Incident Command Actions</p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.625rem' }}>
             {canAccept && (
               <>
                 <button onClick={() => runAction('accept')} disabled={actionLoading} className="btn-success"
                   style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem' }}>
-                  Accept & Help
+                  Acknowledge & Mobilize
                 </button>
                 <button onClick={() => runAction('reject')} disabled={actionLoading} className="btn-ghost">
-                  Pass
+                  Stand Down
                 </button>
               </>
             )}
             {canComplete && (
               <button onClick={() => runAction('complete')} disabled={actionLoading} className="btn-success"
                 style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem' }}>
-                Mark Resolved / Complete
+                Mark Incident Resolved
               </button>
             )}
             {canCancel && (
               <button onClick={() => runAction('cancel')} disabled={actionLoading} className="btn-danger"
                 style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem' }}>
-                {isRequesterUser ? 'Cancel Emergency' : 'Withdraw Assignment'}
+                {isRequesterUser ? 'Abort Dispatch' : 'Withdraw Unit'}
               </button>
             )}
             {actionLoading && (
@@ -372,9 +372,9 @@ export default function RequestDetails() {
         ) : (
           <div className="card" style={{ padding: '2rem 1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', minHeight: 200 }}>
             <p style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>💬</p>
-            <p style={{ fontWeight: 700, fontSize: '0.9375rem', color: '#2E2D2A', marginBottom: '0.25rem' }}>Chat Unavailable</p>
+            <p style={{ fontWeight: 700, fontSize: '0.9375rem', color: '#2E2D2A', marginBottom: '0.25rem' }}>Tactical Comms Inactive</p>
             <p style={{ fontSize: '0.8125rem', color: '#8A8878', lineHeight: 1.5 }}>
-              Chat becomes active once a helper accepts this request.
+              Tactical comms channel activates upon response unit mobilization.
             </p>
           </div>
         )}

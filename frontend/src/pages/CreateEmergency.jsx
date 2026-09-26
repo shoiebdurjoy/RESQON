@@ -79,10 +79,10 @@ export default function CreateEmergency() {
         emergency_type: emergencyType, description: description.trim(),
         urgency_level: urgencyLevel, latitude: requesterLocation.lat, longitude: requesterLocation.lng,
       }, { headers: authHeaders });
-      toast.success('Emergency request created.');
+      toast.success('Incident dispatched. Units notified across tactical network.');
       navigate('/dashboard');
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Failed to create request.');
+      toast.error(err.response?.data?.error || 'Failed to dispatch incident.');
     } finally {
       setIsSubmitting(false);
     }
@@ -106,13 +106,13 @@ export default function CreateEmergency() {
       <div style={{ marginBottom: '2rem' }}>
         <button onClick={() => navigate('/dashboard')}
           style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.8125rem', color: '#5A5850', background: 'none', border: 'none', cursor: 'pointer', padding: 0, marginBottom: '1rem', fontFamily: "'Sora', sans-serif", fontWeight: 500 }}>
-          <ArrowLeft size={14} /> Back to Dashboard
+          <ArrowLeft size={14} /> Back to Operations
         </button>
         <h1 style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 800, fontSize: '1.75rem', letterSpacing: '-0.025em', color: '#0D0C0A', lineHeight: 1.15 }}>
-          Create Emergency Request
+          Dispatch Emergency Incident
         </h1>
         <p style={{ fontSize: '0.875rem', color: '#5A5850', marginTop: '0.375rem' }}>
-          Describe your situation and share your location so helpers can respond quickly.
+          Initiate emergency dispatch. Transmit GPS field coordinates and triage parameters to mobilize rapid response units.
         </p>
       </div>
 
@@ -121,7 +121,7 @@ export default function CreateEmergency() {
         {/* Step 1 — Type */}
         <div className="card section-enter stagger-1" style={{ padding: '1.5rem' }}>
           <p style={{ fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#8A8878', marginBottom: '0.875rem' }}>
-            1 — Emergency Type
+            1 — Incident Classification
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '0.75rem' }}>
             {TYPES.map(t => {
@@ -150,25 +150,25 @@ export default function CreateEmergency() {
         {/* Step 2 — Description */}
         <div className="card section-enter stagger-2" style={{ padding: '1.5rem' }}>
           <label style={{ display: 'block', fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#8A8878', marginBottom: '0.625rem' }}>
-            2 — Description
+            2 — Incident Description & SitRep
           </label>
           <textarea
             rows={5}
             value={description}
             onChange={e => setDescription(e.target.value)}
-            placeholder={`Describe the ${selectedType?.label || 'emergency'} — include relevant details, how many people are affected, and any special requirements…`}
+            placeholder={`Provide detailed situation report (SitRep) for ${selectedType?.label || 'incident'} — symptoms, casualties, immediate hazards, and access requirements…`}
             className="input-field"
             style={{ resize: 'vertical', lineHeight: 1.6 }}
           />
           <p style={{ fontSize: '0.75rem', color: '#8A8878', marginTop: '0.375rem' }}>
-            {description.length} characters — be as specific as possible
+            {description.length} characters — accurate reporting speeds response
           </p>
         </div>
 
         {/* Step 3 — Urgency */}
         <div className="card section-enter stagger-3" style={{ padding: '1.5rem' }}>
           <p style={{ fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#8A8878', marginBottom: '0.875rem' }}>
-            3 — Urgency Level
+            3 — Triage Priority Level
           </p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.625rem' }}>
             {URGENCIES.map(u => {
@@ -196,7 +196,7 @@ export default function CreateEmergency() {
         {/* Step 4 — Location */}
         <div className="card section-enter stagger-4" style={{ padding: '1.5rem' }}>
           <p style={{ fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#8A8878', marginBottom: '0.875rem' }}>
-            4 — Your Location
+            4 — Geolocation & Field Coordinates
           </p>
 
           {/* Detected location bar */}
@@ -205,7 +205,7 @@ export default function CreateEmergency() {
               <MapPin size={15} style={{ color: requesterLocation ? '#1A7F4E' : '#8A8878', marginTop: '0.1rem', flexShrink: 0 }} />
               <div style={{ minWidth: 0 }}>
                 <p style={{ fontSize: '0.8125rem', fontWeight: 600, color: '#0D0C0A' }}>
-                  {isDetecting ? 'Detecting location…' : requesterLocation ? 'Location set' : 'Location not set'}
+                  {isDetecting ? 'Detecting coordinates…' : requesterLocation ? 'Field coordinates confirmed' : 'Location coordinates not set'}
                 </p>
                 <p style={{ fontSize: '0.75rem', color: '#5A5850', marginTop: '0.15rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%' }}>
                   {locationAddress}
@@ -223,7 +223,7 @@ export default function CreateEmergency() {
               {isDetecting
                 ? <span style={{ width: 12, height: 12, borderRadius: '50%', border: '2px solid #D0CEC4', borderTopColor: '#8A8878', animation: 'spin 0.7s linear infinite', display: 'inline-block' }} />
                 : <Crosshair size={13} />}
-              {isDetecting ? 'Detecting…' : 'Use my location'}
+              {isDetecting ? 'Acquiring GPS…' : 'Acquire GPS coordinates'}
             </button>
           </div>
 
@@ -234,7 +234,7 @@ export default function CreateEmergency() {
             onLocationChange={async (lat, lng) => { await updateRequesterLocation(lat, lng); }}
           />
           <p style={{ fontSize: '0.75rem', color: '#8A8878', marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-            <MapPin size={11} /> Click the map or drag the marker to set your exact location.
+            <MapPin size={11} /> Click on map or drag pin to position exact incident staging point.
           </p>
         </div>
 
@@ -249,9 +249,9 @@ export default function CreateEmergency() {
             {isSubmitting
               ? <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
                   <span style={{ width: 14, height: 14, borderRadius: '50%', border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', animation: 'spin 0.7s linear infinite', display: 'inline-block' }} />
-                  Submitting…
+                  Transmitting…
                 </span>
-              : 'Create Emergency Request'}
+              : 'Dispatch Incident'}
           </button>
         </div>
       </form>
