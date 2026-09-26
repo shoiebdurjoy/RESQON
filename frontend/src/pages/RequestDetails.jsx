@@ -152,7 +152,7 @@ export default function RequestDetails() {
     return (
       <div style={{ maxWidth: 1024, margin: '0 auto', padding: '4rem 1.5rem', textAlign: 'center' }}>
         <p style={{ fontSize: '3rem', marginBottom: '1rem' }}>🔍</p>
-        <p style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 800, fontSize: '1.25rem', color: '#0D0C0A', marginBottom: '0.375rem' }}>
+        <p style={{ fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif", fontWeight: 800, fontSize: '1.25rem', letterSpacing: '-0.025em', color: '#0D0C0A', marginBottom: '0.375rem' }}>
           Request not found
         </p>
         <p style={{ fontSize: '0.875rem', color: '#5A5850', marginBottom: '1.5rem' }}>
@@ -208,7 +208,7 @@ export default function RequestDetails() {
                 <span className={STATUS_BADGE[status] || 'badge-pending'}>{requestData.status}</span>
               </div>
 
-              <h1 style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 800, fontSize: '1.375rem', letterSpacing: '-0.02em', color: '#0D0C0A', marginBottom: '0.375rem', lineHeight: 1.2 }}>
+              <h1 style={{ fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif", fontWeight: 800, fontSize: '1.375rem', letterSpacing: '-0.03em', color: '#0D0C0A', marginBottom: '0.375rem', lineHeight: 1.2 }}>
                 Incident Dossier #{requestData.id}
               </h1>
               <p style={{ fontSize: '0.875rem', color: '#5A5850', lineHeight: 1.6, maxWidth: 520 }}>

@@ -150,10 +150,10 @@ export default function RiskFlagged() {
   return (
     <div className="page-enter" style={{ maxWidth: 1280, margin: '0 auto', padding: '2rem 1.5rem' }}>
 
-      {/* Header — Task G: removed "Member 2 · Module 3" */}
+      {/* Header */}
       <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1rem', marginBottom: '1.5rem' }}>
         <div>
-          <h1 style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 800, fontSize: '1.75rem', letterSpacing: '-0.025em', color: '#0D0C0A', lineHeight: 1.15 }}>
+          <h1 style={{ fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif", fontWeight: 800, fontSize: '1.75rem', letterSpacing: '-0.035em', color: '#0D0C0A', lineHeight: 1.15 }}>
             Risk Stratification & Priority Triage
           </h1>
           <p style={{ fontSize: '0.875rem', color: '#5A5850', marginTop: '0.375rem' }}>
@@ -162,13 +162,13 @@ export default function RiskFlagged() {
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.5rem' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#EBF2FC', border: '1px solid #B4CFF0', borderRadius: 6, padding: '0.5rem 0.875rem' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#EBF2FC', border: '1px solid #B4CFF0', borderRadius: 8, padding: '0.5rem 0.875rem' }}>
             <Users size={14} style={{ color: '#1854B4' }} />
-            <span style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 800, fontSize: '1.25rem', color: '#0D0C0A', lineHeight: 1 }}>{availableHelpers}</span>
+            <span style={{ fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif", fontWeight: 800, fontSize: '1.25rem', letterSpacing: '-0.02em', color: '#0D0C0A', lineHeight: 1 }}>{availableHelpers}</span>
             <span style={{ fontSize: '0.75rem', color: '#5A5850' }}>field units on duty</span>
           </div>
           <button onClick={load} disabled={loading}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.75rem', fontWeight: 600, color: '#5A5850', background: 'transparent', border: '1px solid #D0CEC4', borderRadius: 6, padding: '0.3rem 0.75rem', cursor: 'pointer', fontFamily: "'Sora', sans-serif" }}>
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.75rem', fontWeight: 600, color: '#5A5850', background: 'transparent', border: '1px solid #D0CEC4', borderRadius: 6, padding: '0.3rem 0.75rem', cursor: 'pointer', fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif" }}>
             <RefreshCw size={12} style={{ animation: loading ? 'spin 0.7s linear infinite' : 'none' }} />
             {lastRefresh ? `Updated ${lastRefresh.toLocaleTimeString()}` : 'Refresh'}
           </button>
@@ -197,7 +197,7 @@ export default function RiskFlagged() {
           const active = activeTab === key;
           return (
             <button key={key} onClick={() => setActiveTab(key)}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem', padding: '0.4rem 0.875rem', fontSize: '0.8125rem', fontWeight: active ? 700 : 500, borderRadius: 6, border: 'none', cursor: 'pointer', fontFamily: "'Sora', sans-serif", transition: 'all 0.14s ease', background: active ? '#FFFFFF' : 'transparent', color: active ? '#0D0C0A' : '#5A5850', boxShadow: active ? '0 1px 3px rgba(0,0,0,0.08)' : 'none' }}>
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem', padding: '0.4rem 0.875rem', fontSize: '0.8125rem', fontWeight: active ? 700 : 500, borderRadius: 6, border: 'none', cursor: 'pointer', fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif", transition: 'all 0.14s ease', background: active ? '#FFFFFF' : 'transparent', color: active ? '#0D0C0A' : '#5A5850', boxShadow: active ? '0 1px 3px rgba(0,0,0,0.08)' : 'none' }}>
               <Icon size={13} />
               {label}
               <span style={{ fontSize: '0.6875rem', fontWeight: 700, background: active ? '#FEF3F1' : '#E4E2DA', color: active ? '#D93B2B' : '#8A8878', borderRadius: 99, padding: '0.1rem 0.45rem' }}>{count}</span>

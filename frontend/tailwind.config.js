@@ -7,9 +7,10 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        display: ['Fraunces', 'Georgia', 'serif'],
-        ui:      ['Sora', 'system-ui', 'sans-serif'],
-        sans:    ['Sora', 'system-ui', 'sans-serif'], // override default sans
+        display: ['Plus Jakarta Sans', 'Geist', 'Inter', 'system-ui', 'sans-serif'],
+        ui:      ['Plus Jakarta Sans', 'Geist', 'Inter', 'system-ui', 'sans-serif'],
+        sans:    ['Plus Jakarta Sans', 'Geist', 'Inter', 'system-ui', 'sans-serif'],
+        mono:    ['Geist Mono', 'JetBrains Mono', 'monospace'],
       },
       colors: {
         // Base surfaces

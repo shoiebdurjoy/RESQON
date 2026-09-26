@@ -96,7 +96,7 @@ export default function ProfileModal({ isOpen, onClose }) {
         background: '#FFFFFF', borderRadius: 12, border: '1px solid #E4E2DA',
         boxShadow: '0 20px 40px -10px rgba(0,0,0,0.25)',
         width: '100%', maxWidth: 520, maxHeight: '90vh', overflowY: 'auto',
-        fontFamily: "'Sora', sans-serif",
+        fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif",
       }}>
         {/* Modal Header */}
         <div style={{
@@ -206,7 +206,7 @@ export default function ProfileModal({ isOpen, onClose }) {
                       style={{
                         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                         padding: '0.5rem 0.75rem', borderRadius: 6, fontSize: '0.8125rem',
-                        fontWeight: 600, cursor: 'pointer', fontFamily: "'Sora', sans-serif",
+                        fontWeight: 600, cursor: 'pointer', fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif",
                         border: active ? '1px solid #A8DCBC' : '1px solid #E4E2DA',
                         background: active ? '#EDF8F2' : '#F7F6F1',
                         color: active ? '#15663E' : '#5A5850',

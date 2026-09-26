@@ -105,9 +105,9 @@ export default function TrendsDashboard() {
   return (
     <div className="page-enter" style={{ maxWidth: 1280, margin: '0 auto', padding: '2rem 1.5rem' }}>
 
-      {/* Header — Task G: removed "Member 3 · Module 3" */}
+      {/* Header */}
       <div style={{ marginBottom: '2rem' }}>
-        <h1 style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 800, fontSize: '1.75rem', letterSpacing: '-0.025em', color: '#0D0C0A', lineHeight: 1.15 }}>
+        <h1 style={{ fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif", fontWeight: 800, fontSize: '1.75rem', letterSpacing: '-0.035em', color: '#0D0C0A', lineHeight: 1.15 }}>
           Operational Trends & Incident Lifecycle Audit
         </h1>
         <p style={{ fontSize: '0.875rem', color: '#5A5850', marginTop: '0.375rem' }}>
@@ -141,7 +141,7 @@ export default function TrendsDashboard() {
                 const bar = TYPE_BAR[type] || '#8A8878';
                 const isHigh = trends.high_demand_type === type;
                 return (
-                  <div key={type} className="section-enter" style={{ background: isHigh ? '#FEF3F1' : '#F7F6F1', border: `1px solid ${isHigh ? '#F5C4BE' : '#E4E2DA'}`, borderRadius: 8, padding: '1rem', transition: 'box-shadow 0.22s ease, transform 0.22s ease', animationDelay: `${i * 65}ms` }}
+                  <div key={type} className="section-enter" style={{ background: isHigh ? '#FEF3F1' : '#F7F6F1', border: `1px solid ${isHigh ? '#F5C4BE' : '#E4E2DA'}`, borderRadius: 10, padding: '1rem', transition: 'box-shadow 0.22s ease, transform 0.22s ease', animationDelay: `${i * 65}ms` }}
                     onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.08)'; }}
                     onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = ''; }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
@@ -152,7 +152,7 @@ export default function TrendsDashboard() {
                         </span>
                       )}
                     </div>
-                    <p style={{ fontFamily: "'Sora', system-ui, sans-serif", fontWeight: 800, fontSize: '2rem', letterSpacing: '-0.02em', color: bar, lineHeight: 1 }}>{count}</p>
+                    <p style={{ fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif", fontWeight: 800, fontSize: '2rem', letterSpacing: '-0.03em', color: bar, lineHeight: 1 }}>{count}</p>
                     <p style={{ fontSize: '0.75rem', color: '#5A5850', marginTop: '0.25rem' }}>{TYPE_LABEL[type] || type} incidents logged</p>
                   </div>
                 );

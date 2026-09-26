@@ -42,10 +42,10 @@ export default function Register() {
       <div className="hidden lg:flex slide-left" style={{ width: '42%', flexShrink: 0, flexDirection: 'column', justifyContent: 'space-between', background: '#0D0C0A', borderRight: '1px solid #1E1D1A', padding: '3rem 3.5rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <Zap size={20} style={{ color: '#D93B2B' }} strokeWidth={2.5} />
-          <span style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 800, fontSize: '1.125rem', letterSpacing: '-0.02em', color: '#D93B2B' }}>RESQON</span>
+          <span style={{ fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif", fontWeight: 900, fontSize: '1.125rem', letterSpacing: '-0.035em', color: '#D93B2B' }}>RESQON</span>
         </div>
         <div>
-          <p style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 800, fontSize: 'clamp(2.5rem,4vw,3.5rem)', lineHeight: 1.05, letterSpacing: '-0.03em', color: '#F0EFE9', marginBottom: '1.5rem' }}>
+          <p style={{ fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif", fontWeight: 900, fontSize: 'clamp(2.5rem,4vw,3.5rem)', lineHeight: 1.05, letterSpacing: '-0.04em', color: '#F0EFE9', marginBottom: '1.5rem' }}>
             Join the<br />response<br /><span style={{ color: '#D93B2B' }}>network.</span>
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
@@ -60,7 +60,7 @@ export default function Register() {
             ))}
           </div>
         </div>
-        <p style={{ fontSize: '0.75rem', color: '#353230' }}>RESQON Emergency Coordination System</p>
+        <p style={{ fontSize: '0.75rem', color: '#353230', fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif" }}>RESQON Emergency Coordination System</p>
       </div>
 
       {/* Right — form (light) */}
@@ -68,9 +68,9 @@ export default function Register() {
         <div className="slide-right" style={{ width: '100%', maxWidth: 440, paddingBottom: '2rem' }}>
           <div className="flex lg:hidden" style={{ alignItems: 'center', gap: '0.375rem', marginBottom: '2rem' }}>
             <Zap size={17} style={{ color: '#D93B2B' }} strokeWidth={2.5} />
-            <span style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 800, fontSize: '1.0625rem', color: '#D93B2B' }}>RESQON</span>
+            <span style={{ fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif", fontWeight: 900, fontSize: '1.0625rem', letterSpacing: '-0.035em', color: '#D93B2B' }}>RESQON</span>
           </div>
-          <h1 style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 800, fontSize: '1.75rem', letterSpacing: '-0.025em', color: '#0D0C0A', marginBottom: '0.375rem', lineHeight: 1.1 }}>Create account</h1>
+          <h1 style={{ fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif", fontWeight: 800, fontSize: '1.75rem', letterSpacing: '-0.035em', color: '#0D0C0A', marginBottom: '0.375rem', lineHeight: 1.1 }}>Create account</h1>
           <p style={{ fontSize: '0.875rem', color: '#8A8878', marginBottom: '2rem' }}>Join as a requester or register as a helper.</p>
 
           {error && (
@@ -83,9 +83,10 @@ export default function Register() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.625rem' }}>
               {[['requester','Requester'],['helper','Helper']].map(([val, label]) => (
                 <button key={val} type="button" onClick={() => setRole(val)}
-                  style={{ padding: '0.75rem', borderRadius: 6, textAlign: 'center', cursor: 'pointer', fontFamily: "'Sora', sans-serif", fontSize: '0.875rem', fontWeight: 600, transition: 'all 0.14s ease',
+                  style={{ padding: '0.75rem', borderRadius: 8, textAlign: 'center', cursor: 'pointer', fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif", fontSize: '0.875rem', fontWeight: 600, transition: 'all 0.16s ease',
                     background: role === val ? '#0D0C0A' : '#FFFFFF', color: role === val ? '#F0EFE9' : '#5A5850',
-                    border: role === val ? '1px solid #0D0C0A' : '1px solid #D0CEC4' }}>
+                    border: role === val ? '1.5px solid #0D0C0A' : '1.5px solid #E8E7E0',
+                    boxShadow: role === val ? '0 4px 12px rgba(13,12,10,0.15)' : 'none' }}>
                   {label}
                 </button>
               ))}
@@ -132,8 +133,9 @@ export default function Register() {
                       const active = skills.includes(skill);
                       return (
                         <button key={skill} type="button" onClick={() => toggleSkill(skill)}
-                          style={{ padding: '0.3rem 0.75rem', borderRadius: 99, fontSize: '0.8125rem', fontWeight: 500, cursor: 'pointer', transition: 'all 0.14s ease', fontFamily: "'Sora', sans-serif",
-                            background: active ? '#0D0C0A' : '#FFFFFF', color: active ? '#F0EFE9' : '#5A5850', border: active ? '1px solid #0D0C0A' : '1px solid #D0CEC4' }}>
+                          style={{ padding: '0.35rem 0.8rem', borderRadius: 99, fontSize: '0.8125rem', fontWeight: 500, cursor: 'pointer', transition: 'all 0.14s ease', fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif",
+                            background: active ? '#0D0C0A' : '#FFFFFF', color: active ? '#F0EFE9' : '#5A5850', border: active ? '1px solid #0D0C0A' : '1px solid #D0CEC4',
+                            boxShadow: active ? '0 2px 8px rgba(0,0,0,0.12)' : 'none' }}>
                           {skill}
                         </button>
                       );

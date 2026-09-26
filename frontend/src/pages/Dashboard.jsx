@@ -80,7 +80,7 @@ function StatCard({ label, value, icon, statKey, animDelay = 0 }) {
         <p style={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: s.accent }}>{label}</p>
         <span style={{ color: s.accent, opacity: 0.7, transition: 'transform 0.2s ease' }}>{icon}</span>
       </div>
-      <p className="num-reveal" style={{ fontFamily: "'Sora', system-ui, sans-serif", fontWeight: 800, fontSize: '2.5rem', letterSpacing: '-0.03em', color: '#0D0C0A', lineHeight: 1, animationDelay: `${animDelay + 80}ms` }}>{animValue}</p>
+      <p className="num-reveal" style={{ fontFamily: "'Geist', 'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: '2.5rem', letterSpacing: '-0.035em', color: '#0D0C0A', lineHeight: 1, animationDelay: `${animDelay + 80}ms` }}>{animValue}</p>
     </div>
   );
 }
@@ -452,7 +452,7 @@ export default function Dashboard() {
               <Wifi size={10} /> Tactical Network: Live
             </span>
           </div>
-          <h1 style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 800, fontSize: 'clamp(1.5rem, 3vw, 2rem)', letterSpacing: '-0.025em', color: '#0D0C0A', lineHeight: 1.15 }}>
+          <h1 style={{ fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif", fontWeight: 800, fontSize: 'clamp(1.5rem, 3vw, 2.125rem)', letterSpacing: '-0.035em', color: '#0D0C0A', lineHeight: 1.15 }}>
             Incident Command Operations Center
           </h1>
         </div>
@@ -505,8 +505,8 @@ export default function Dashboard() {
             background: activeTab === 'community' ? '#FEF3F1' : 'transparent',
             color: activeTab === 'community' ? '#D93B2B' : '#5A5850',
             border: activeTab === 'community' ? '1px solid #F5C4BE' : '1px solid transparent',
-            fontWeight: 700, fontSize: '0.8125rem', padding: '0.4rem 0.9rem', borderRadius: 6,
-            cursor: 'pointer', fontFamily: "'Sora', sans-serif"
+            fontWeight: 700, fontSize: '0.8125rem', padding: '0.4rem 0.9rem', borderRadius: 8,
+            cursor: 'pointer', fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif"
           }}
         >
           Active Incident Queue ({communityRequests.length})
@@ -517,8 +517,8 @@ export default function Dashboard() {
             background: activeTab === 'mine' ? '#FEF3F1' : 'transparent',
             color: activeTab === 'mine' ? '#D93B2B' : '#5A5850',
             border: activeTab === 'mine' ? '1px solid #F5C4BE' : '1px solid transparent',
-            fontWeight: 700, fontSize: '0.8125rem', padding: '0.4rem 0.9rem', borderRadius: 6,
-            cursor: 'pointer', fontFamily: "'Sora', sans-serif"
+            fontWeight: 700, fontSize: '0.8125rem', padding: '0.4rem 0.9rem', borderRadius: 8,
+            cursor: 'pointer', fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif"
           }}
         >
           My Field Assignments & Incidents ({myRequests.length})

@@ -24,18 +24,18 @@ export default function Login() {
       <div className="hidden lg:flex slide-left" style={{ width: '42%', background: '#0D0C0A', borderRight: '1px solid #1E1D1A', flexDirection: 'column', justifyContent: 'space-between', padding: '3rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <Zap size={20} style={{ color: '#D93B2B' }} strokeWidth={2.5} />
-          <span style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 800, fontSize: '1.125rem', letterSpacing: '-0.02em', color: '#D93B2B' }}>RESQON</span>
+          <span style={{ fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif", fontWeight: 900, fontSize: '1.125rem', letterSpacing: '-0.035em', color: '#D93B2B' }}>RESQON</span>
         </div>
         <div>
           <p style={{ fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#353230', marginBottom: '1.25rem' }}>Emergency Response Platform</p>
-          <h1 style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 900, fontSize: '3.5rem', letterSpacing: '-0.04em', color: '#F0EFE9', lineHeight: 1.05 }}>
+          <h1 style={{ fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif", fontWeight: 900, fontSize: '3.5rem', letterSpacing: '-0.045em', color: '#F0EFE9', lineHeight: 1.05 }}>
             Help<br />routed<br />in<br /><span style={{ color: '#D93B2B' }}>seconds.</span>
           </h1>
           <p style={{ fontSize: '0.9375rem', color: '#4E4D49', marginTop: '1.5rem', lineHeight: 1.7, maxWidth: 300 }}>
             A mission-critical platform connecting people in crisis with available helpers in real time.
           </p>
         </div>
-        <p style={{ fontSize: '0.75rem', color: '#353230', fontFamily: "'Sora', sans-serif" }}>RESQON Emergency Coordination System</p>
+        <p style={{ fontSize: '0.75rem', color: '#353230', fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif" }}>RESQON Emergency Coordination System</p>
       </div>
 
       {/* Right panel — light */}
@@ -43,10 +43,10 @@ export default function Login() {
         <div className="slide-right" style={{ width: '100%', maxWidth: 400 }}>
           <div className="flex lg:hidden" style={{ alignItems: 'center', gap: '0.4rem', marginBottom: '2rem' }}>
             <Zap size={18} style={{ color: '#D93B2B' }} strokeWidth={2.5} />
-            <span style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 800, fontSize: '1rem', color: '#D93B2B' }}>RESQON</span>
+            <span style={{ fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif", fontWeight: 900, fontSize: '1rem', letterSpacing: '-0.035em', color: '#D93B2B' }}>RESQON</span>
           </div>
           <p style={{ fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#8A8878', marginBottom: '0.5rem' }}>Sign in</p>
-          <h2 style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 800, fontSize: '1.75rem', letterSpacing: '-0.025em', color: '#0D0C0A', marginBottom: '2rem', lineHeight: 1.15 }}>Welcome back</h2>
+          <h2 style={{ fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif", fontWeight: 800, fontSize: '1.75rem', letterSpacing: '-0.035em', color: '#0D0C0A', marginBottom: '2rem', lineHeight: 1.15 }}>Welcome back</h2>
 
           {error && (
             <div key={error} className="error-shake" style={{ background: '#FEF3F1', border: '1px solid #F5C4BE', borderRadius: 6, padding: '0.75rem 1rem', marginBottom: '1.25rem', fontSize: '0.875rem', color: '#B02E20', fontWeight: 500 }}>{error}</div>

@@ -155,7 +155,7 @@ export default function AppNavbar() {
     padding: '0.35rem 0.75rem', fontSize: '0.8125rem', fontWeight: 500,
     borderRadius: 6, textDecoration: 'none',
     transition: 'color 0.15s ease, background 0.15s ease',
-    fontFamily: "'Sora', sans-serif",
+    fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif",
     position: 'relative',
   };
 
@@ -169,7 +169,7 @@ export default function AppNavbar() {
             <Zap size={16} style={{ color: '#D93B2B' }} strokeWidth={2.5} />
           </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem' }}>
-            <span style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 800, fontSize: '1.125rem', letterSpacing: '-0.02em', color: '#0D0C0A' }}>
+            <span style={{ fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif", fontWeight: 900, fontSize: '1.125rem', letterSpacing: '-0.035em', color: '#0D0C0A' }}>
               RESQON
             </span>
             <span style={{ fontSize: '0.625rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#8A8878' }} className="hidden sm:inline">
@@ -305,7 +305,7 @@ export default function AppNavbar() {
               padding: '0.38rem 0.85rem', fontSize: '0.8125rem', fontWeight: 700,
               borderRadius: 6, textDecoration: 'none', color: '#FFFFFF',
               background: '#D93B2B', boxShadow: '0 1px 3px rgba(217,59,43,0.3)',
-              fontFamily: "'Sora', sans-serif", transition: 'background 0.15s ease, transform 0.15s ease',
+              fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif", transition: 'background 0.15s ease, transform 0.15s ease',
               flexShrink: 0,
             }}
             onMouseEnter={e => { e.currentTarget.style.background = '#B02E20'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
@@ -323,7 +323,7 @@ export default function AppNavbar() {
             style={{
               display: 'inline-flex', alignItems: 'center', gap: '0.375rem',
               padding: '0.3rem 0.65rem', borderRadius: 99,
-              fontSize: '0.75rem', fontWeight: 600, fontFamily: "'Sora', sans-serif",
+              fontSize: '0.75rem', fontWeight: 600, fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif",
               border: helperOnline ? '1px solid #A8DCBC' : '1px solid #D0CEC4',
               background: helperOnline ? '#EDF8F2' : '#F7F6F1',
               color: helperOnline ? '#15663E' : '#5A5850',
@@ -353,7 +353,7 @@ export default function AppNavbar() {
               background: onlineCount > 0 ? '#EDF8F2' : '#F7F6F1',
               border: `1px solid ${onlineCount > 0 ? '#A8DCBC' : '#D0CEC4'}`,
               borderRadius: 99, padding: '0.22rem 0.55rem',
-              fontFamily: "'Sora', sans-serif", flexShrink: 0,
+              fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif", flexShrink: 0,
             }}
             className="hidden sm:inline-flex"
           >
@@ -376,7 +376,7 @@ export default function AppNavbar() {
                 width: 26, height: 26, borderRadius: '50%',
                 background: '#0D0C0A', color: '#FFFFFF',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontWeight: 700, fontSize: '0.75rem', fontFamily: "'Sora', sans-serif",
+                fontWeight: 700, fontSize: '0.75rem', fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif",
               }}>
                 {userInitials}
               </div>
@@ -421,7 +421,7 @@ export default function AppNavbar() {
                   style={{
                     display: 'flex', alignItems: 'center', gap: '0.5rem',
                     padding: '0.4rem 0.5rem', fontSize: '0.8125rem', color: '#5A5850',
-                    borderRadius: 6, textDecoration: 'none', fontFamily: "'Sora', sans-serif",
+                    borderRadius: 6, textDecoration: 'none', fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif",
                     fontWeight: 500,
                   }}
                   onMouseEnter={e => e.currentTarget.style.background = '#F7F6F1'}
@@ -436,7 +436,7 @@ export default function AppNavbar() {
                     width: '100%', display: 'flex', alignItems: 'center', gap: '0.5rem',
                     padding: '0.4rem 0.5rem', fontSize: '0.8125rem', color: '#5A5850',
                     borderRadius: 6, border: 'none', background: 'transparent',
-                    cursor: 'pointer', fontFamily: "'Sora', sans-serif", fontWeight: 500,
+                    cursor: 'pointer', fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif", fontWeight: 500,
                     textAlign: 'left',
                   }}
                   onMouseEnter={e => e.currentTarget.style.background = '#F7F6F1'}
@@ -452,7 +452,7 @@ export default function AppNavbar() {
                       width: '100%', display: 'flex', alignItems: 'center', gap: '0.5rem',
                       padding: '0.4rem 0.5rem', fontSize: '0.8125rem', color: '#D93B2B',
                       borderRadius: 6, border: 'none', background: 'transparent',
-                      cursor: 'pointer', fontFamily: "'Sora', sans-serif", fontWeight: 600,
+                      cursor: 'pointer', fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif", fontWeight: 600,
                       textAlign: 'left',
                     }}
                     onMouseEnter={e => e.currentTarget.style.background = '#FEF3F1'}
@@ -600,7 +600,7 @@ export default function AppNavbar() {
                 fontSize: '0.875rem', fontWeight: 600,
                 color: '#2E2D2A', background: 'transparent', border: 'none',
                 cursor: 'pointer', width: '100%', textAlign: 'left',
-                fontFamily: "'Sora', sans-serif",
+                fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif",
               }}
             >
               <User size={16} /> Responder Qualifications & Profile
@@ -619,7 +619,7 @@ export default function AppNavbar() {
                 display: 'inline-flex', alignItems: 'center', gap: '0.35rem',
                 padding: '0.35rem 0.75rem', fontSize: '0.75rem', fontWeight: 700,
                 color: '#B02E20', background: '#FEF3F1', border: '1px solid #F5C4BE',
-                borderRadius: 6, cursor: 'pointer', fontFamily: "'Sora', sans-serif",
+                borderRadius: 6, cursor: 'pointer', fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif",
               }}
             >
               <LogOut size={12} /> Sign out

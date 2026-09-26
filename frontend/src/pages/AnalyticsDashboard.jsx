@@ -25,7 +25,7 @@ function StatCard({ label, value, icon, accent, subtitle, animDelay = 0 }) {
         <p style={{ fontSize: '0.8125rem', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', color: '#5A5850' }}>{label}</p>
         <span style={{ color: accent, opacity: 0.8 }}>{icon}</span>
       </div>
-      <p className="num-reveal" style={{ fontFamily: "'Sora', system-ui, sans-serif", fontWeight: 800, fontSize: '2.5rem', letterSpacing: '-0.03em', color: '#0D0C0A', lineHeight: 1, animationDelay: `${animDelay + 80}ms` }}>{value == null ? '—' : animValue}</p>
+      <p className="num-reveal" style={{ fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif", fontWeight: 800, fontSize: '2.5rem', letterSpacing: '-0.035em', color: '#0D0C0A', lineHeight: 1, animationDelay: `${animDelay + 80}ms` }}>{value == null ? '—' : animValue}</p>
       {subtitle && <p style={{ fontSize: '0.75rem', color: '#8A8878', marginTop: '0.375rem' }}>{subtitle}</p>}
     </div>
   );
@@ -71,9 +71,9 @@ export default function AnalyticsDashboard() {
   return (
     <div className="page-enter" style={{ maxWidth: 1280, margin: '0 auto', padding: '2rem 1.5rem' }}>
 
-      {/* Header — Task G: removed "Member 1 · Module 3" */}
+      {/* Header */}
       <div style={{ marginBottom: '2rem' }}>
-        <h1 style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 800, fontSize: '1.75rem', letterSpacing: '-0.025em', color: '#0D0C0A', lineHeight: 1.15 }}>
+        <h1 style={{ fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif", fontWeight: 800, fontSize: '1.75rem', letterSpacing: '-0.035em', color: '#0D0C0A', lineHeight: 1.15 }}>
           Command Analytics & Performance Metrics
         </h1>
         <p style={{ fontSize: '0.875rem', color: '#5A5850', marginTop: '0.375rem' }}>
@@ -152,7 +152,7 @@ export default function AnalyticsDashboard() {
               <p style={{ fontSize: '0.8125rem', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', color: '#5A5850', marginBottom: '1rem' }}>
                 Incident Resolution Rate
               </p>
-              <p className="num-reveal" style={{ fontFamily: "'Sora', system-ui, sans-serif", fontWeight: 800, fontSize: '3.25rem', letterSpacing: '-0.03em', color: '#1A7F4E', lineHeight: 1, marginBottom: '0.5rem' }}>
+              <p className="num-reveal" style={{ fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif", fontWeight: 800, fontSize: '3.25rem', letterSpacing: '-0.035em', color: '#1A7F4E', lineHeight: 1, marginBottom: '0.5rem' }}>
                 {animCompletion}<span style={{ fontSize: '1.5rem', color: '#8A8878' }}>%</span>
               </p>
               <p style={{ fontSize: '0.8125rem', color: '#5A5850', marginBottom: '1rem', lineHeight: 1.5 }}>
@@ -170,7 +170,7 @@ export default function AnalyticsDashboard() {
               </p>
               {a.avg_response_time_minutes != null ? (
                 <>
-                  <p className="num-reveal" style={{ fontFamily: "'Sora', system-ui, sans-serif", fontWeight: 800, fontSize: '3.25rem', letterSpacing: '-0.03em', color: '#1854B4', lineHeight: 1, marginBottom: '0.25rem' }}>
+                  <p className="num-reveal" style={{ fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif", fontWeight: 800, fontSize: '3.25rem', letterSpacing: '-0.035em', color: '#1854B4', lineHeight: 1, marginBottom: '0.25rem' }}>
                     {animAvgResponse}
                     <span style={{ fontSize: '1.25rem', fontWeight: 600, color: '#8A8878' }}> min</span>
                   </p>

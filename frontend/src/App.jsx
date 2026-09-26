@@ -21,7 +21,7 @@ function LoadingScreen() {
     <div style={{ minHeight: '100vh', background: '#F0EFE9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div className="scale-in" style={{ background: '#FFFFFF', border: '1px solid #E4E2DA', borderRadius: 12, padding: '1.75rem 2.5rem', boxShadow: '0 4px 24px rgba(0,0,0,0.08)', textAlign: 'center' }}>
         <div style={{ width: 32, height: 32, borderRadius: '50%', border: '3px solid #E4E2DA', borderTopColor: '#D93B2B', animation: 'spin 0.7s linear infinite', margin: '0 auto 1rem' }} />
-        <p style={{ fontFamily: "'Sora', sans-serif", fontSize: '0.8125rem', fontWeight: 600, color: '#8A8878', letterSpacing: '0.04em' }}>Loading…</p>
+        <p style={{ fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif", fontSize: '0.8125rem', fontWeight: 600, color: '#8A8878', letterSpacing: '0.04em' }}>Loading…</p>
       </div>
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
@@ -48,7 +48,7 @@ function PrivateRoute({ role = 'any', children }) {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#F0EFE9', color: '#0D0C0A', fontFamily: "'Sora', sans-serif" }}>
+    <div style={{ minHeight: '100vh', background: '#F0EFE9', color: '#0D0C0A', fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif" }}>
       <AppNavbar />
       {children}
     </div>

@@ -25,7 +25,7 @@ function MetricCard({ label, value, unit, icon, accent, subtitle, animDelay = 0 
         <span style={{ color: accent, opacity: 0.8 }}>{icon}</span>
       </div>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.3rem' }}>
-        <p className="num-reveal" style={{ fontFamily: "'Sora', system-ui, sans-serif", fontWeight: 800, fontSize: '2.5rem', letterSpacing: '-0.03em', color: '#0D0C0A', lineHeight: 1, animationDelay: `${animDelay + 80}ms` }}>{value == null ? '—' : (typeof value === 'number' ? animValue : value)}</p>
+        <p className="num-reveal" style={{ fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif", fontWeight: 800, fontSize: '2.5rem', letterSpacing: '-0.035em', color: '#0D0C0A', lineHeight: 1, animationDelay: `${animDelay + 80}ms` }}>{value == null ? '—' : (typeof value === 'number' ? animValue : value)}</p>
         {unit && <span style={{ fontSize: '0.875rem', color: '#8A8878', fontWeight: 500 }}>{unit}</span>}
       </div>
       {subtitle && <p style={{ fontSize: '0.75rem', color: '#8A8878', marginTop: '0.375rem', lineHeight: 1.45 }}>{subtitle}</p>}
@@ -76,9 +76,9 @@ export default function AIAssistant() {
   return (
     <div className="page-enter" style={{ maxWidth: 1280, margin: '0 auto', padding: '2rem 1.5rem' }}>
 
-      {/* Header — Task G: removed "Member 4 · Module 3" */}
+      {/* Header — Operations Intelligence */}
       <div style={{ marginBottom: '2rem' }}>
-        <h1 style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 800, fontSize: '1.75rem', letterSpacing: '-0.025em', color: '#0D0C0A', lineHeight: 1.15 }}>
+        <h1 style={{ fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif", fontWeight: 800, fontSize: '1.75rem', letterSpacing: '-0.035em', color: '#0D0C0A', lineHeight: 1.15 }}>
           AI Triage & Operations Intelligence
         </h1>
         <p style={{ fontSize: '0.875rem', color: '#5A5850', marginTop: '0.375rem' }}>
@@ -234,13 +234,13 @@ export default function AIAssistant() {
               ))}
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', paddingTop: '0.5rem', borderTop: '1px solid #E4E2DA', marginTop: '0.25rem' }}>
-                <div style={{ background: '#EDF8F2', border: '1px solid #A8DCBC', borderRadius: 6, padding: '0.875rem', textAlign: 'center' }}>
+                <div style={{ background: '#EDF8F2', border: '1px solid #A8DCBC', borderRadius: 8, padding: '0.875rem', textAlign: 'center' }}>
                   <p style={{ fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#8A8878', marginBottom: '0.375rem' }}>Completed</p>
-                  <p style={{ fontFamily: "'Sora', system-ui, sans-serif", fontWeight: 800, fontSize: '2rem', color: '#1A7F4E', lineHeight: 1 }}>{perf.total_completed}</p>
+                  <p style={{ fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif", fontWeight: 800, fontSize: '2rem', letterSpacing: '-0.03em', color: '#1A7F4E', lineHeight: 1 }}>{perf.total_completed}</p>
                 </div>
-                <div style={{ background: '#FEF3F1', border: '1px solid #F5C4BE', borderRadius: 6, padding: '0.875rem', textAlign: 'center' }}>
+                <div style={{ background: '#FEF3F1', border: '1px solid #F5C4BE', borderRadius: 8, padding: '0.875rem', textAlign: 'center' }}>
                   <p style={{ fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#8A8878', marginBottom: '0.375rem' }}>Cancelled</p>
-                  <p style={{ fontFamily: "'Sora', system-ui, sans-serif", fontWeight: 800, fontSize: '2rem', color: '#D93B2B', lineHeight: 1 }}>{perf.total_cancelled}</p>
+                  <p style={{ fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif", fontWeight: 800, fontSize: '2rem', letterSpacing: '-0.03em', color: '#D93B2B', lineHeight: 1 }}>{perf.total_cancelled}</p>
                 </div>
               </div>
             </div>

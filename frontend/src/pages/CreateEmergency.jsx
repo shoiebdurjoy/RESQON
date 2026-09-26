@@ -129,10 +129,10 @@ export default function CreateEmergency() {
       {/* Page header */}
       <div style={{ marginBottom: '2rem' }}>
         <button onClick={() => navigate('/dashboard')}
-          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.8125rem', color: '#5A5850', background: 'none', border: 'none', cursor: 'pointer', padding: 0, marginBottom: '1rem', fontFamily: "'Sora', sans-serif", fontWeight: 500 }}>
+          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.8125rem', color: '#5A5850', background: 'none', border: 'none', cursor: 'pointer', padding: 0, marginBottom: '1rem', fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif", fontWeight: 500 }}>
           <ArrowLeft size={14} /> Back to Operations
         </button>
-        <h1 style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 800, fontSize: '1.75rem', letterSpacing: '-0.025em', color: '#0D0C0A', lineHeight: 1.15 }}>
+        <h1 style={{ fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif", fontWeight: 800, fontSize: '1.75rem', letterSpacing: '-0.035em', color: '#0D0C0A', lineHeight: 1.15 }}>
           Dispatch Emergency Incident
         </h1>
         <p style={{ fontSize: '0.875rem', color: '#5A5850', marginTop: '0.375rem' }}>
@@ -154,13 +154,13 @@ export default function CreateEmergency() {
                 <button key={t.value} type="button" onClick={() => setEmergencyType(t.value)}
                   style={{
                     display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.375rem',
-                    padding: '1rem', borderRadius: 8, cursor: 'pointer', textAlign: 'left',
-                    fontFamily: "'Sora', sans-serif",
+                    padding: '1rem', borderRadius: 10, cursor: 'pointer', textAlign: 'left',
+                    fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif",
                     transition: 'all 0.18s cubic-bezier(0.16,1,0.3,1)',
                     background: active ? t.bg : '#FFFFFF',
-                    border: active ? `2px solid ${t.accent}` : '2px solid #E4E2DA',
-                    transform: active ? 'translateY(-1px)' : '',
-                    boxShadow: active ? `0 4px 12px ${t.accent}22` : '',
+                    border: active ? `2px solid ${t.accent}` : '1.5px solid #E8E7E0',
+                    transform: active ? 'translateY(-2px)' : '',
+                    boxShadow: active ? `0 6px 16px ${t.accent}25` : '0 1px 3px rgba(0,0,0,0.03)',
                   }}>
                   <span style={{ fontSize: '1.5rem', lineHeight: 1 }}>{t.icon}</span>
                   <span style={{ fontWeight: 700, fontSize: '0.9375rem', color: active ? t.accent : '#0D0C0A' }}>{t.label}</span>
@@ -237,10 +237,11 @@ export default function CreateEmergency() {
                 <button key={u.value} type="button" onClick={() => setUrgencyLevel(u.value)}
                   style={{
                     display: 'inline-flex', alignItems: 'center', gap: '0.625rem',
-                    padding: '0.625rem 1rem', borderRadius: 6, cursor: 'pointer',
-                    fontFamily: "'Sora', sans-serif", transition: 'all 0.14s ease', textAlign: 'left',
+                    padding: '0.625rem 1rem', borderRadius: 8, cursor: 'pointer',
+                    fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif", transition: 'all 0.16s ease', textAlign: 'left',
                     background: active ? '#0D0C0A' : '#FFFFFF',
-                    border: `1px solid ${active ? '#0D0C0A' : '#D0CEC4'}`,
+                    border: `1.5px solid ${active ? '#0D0C0A' : '#E8E7E0'}`,
+                    boxShadow: active ? '0 4px 12px rgba(13,12,10,0.15)' : 'none',
                   }}>
                   <span style={{ width: 8, height: 8, borderRadius: '50%', background: u.dot, display: 'inline-block', flexShrink: 0 }} />
                   <span>

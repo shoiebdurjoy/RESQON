@@ -100,7 +100,7 @@ export default function NotificationHistory() {
 
       {/* Page header */}
       <div style={{ marginBottom: '2rem' }}>
-        <h1 style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 800, fontSize: '1.75rem', letterSpacing: '-0.025em', color: '#0D0C0A', lineHeight: 1.15, marginBottom: '0.375rem' }}>
+        <h1 style={{ fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif", fontWeight: 800, fontSize: '1.75rem', letterSpacing: '-0.035em', color: '#0D0C0A', lineHeight: 1.15, marginBottom: '0.375rem' }}>
           Incident Audit Trail & History
         </h1>
         <p style={{ fontSize: '0.875rem', color: '#5A5850' }}>
@@ -136,12 +136,13 @@ export default function NotificationHistory() {
                   type="button"
                   onClick={() => setStatusFilter(pill.key)}
                   style={{
-                    padding: '0.25rem 0.65rem', borderRadius: 99, fontSize: '0.75rem',
-                    fontWeight: 600, cursor: 'pointer', fontFamily: "'Sora', sans-serif",
-                    border: active ? '1px solid #0D0C0A' : '1px solid #D0CEC4',
+                    padding: '0.28rem 0.75rem', borderRadius: 99, fontSize: '0.75rem',
+                    fontWeight: 600, cursor: 'pointer', fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif",
+                    border: active ? '1px solid #0D0C0A' : '1px solid #E8E7E0',
                     background: active ? '#0D0C0A' : '#FFFFFF',
                     color: active ? '#FFFFFF' : '#5A5850',
-                    transition: 'all 0.12s ease',
+                    transition: 'all 0.14s cubic-bezier(0.16,1,0.3,1)',
+                    boxShadow: active ? '0 2px 8px rgba(0,0,0,0.12)' : 'none',
                   }}
                 >
                   {pill.label}
