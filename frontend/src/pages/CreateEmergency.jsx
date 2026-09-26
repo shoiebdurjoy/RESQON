@@ -1,8 +1,8 @@
 import { useContext, useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Crosshair, MapPin } from 'lucide-react';
+import { ArrowLeft, Bot, Crosshair, MapPin, Sparkles } from 'lucide-react';
 
 import AuthContext from '../context/AuthContext';
 import MapView from '../components/MapView';
@@ -24,16 +24,20 @@ const URGENCIES = [
 
 export default function CreateEmergency() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const prefill = location.state || {};
   const { token } = useContext(AuthContext);
 
-  const [emergencyType,      setEmergencyType]      = useState('blood');
-  const [description,        setDescription]        = useState('');
-  const [urgencyLevel,       setUrgencyLevel]       = useState('medium');
+  const [emergencyType,      setEmergencyType]      = useState(prefill.emergencyType || 'blood');
+  const [description,        setDescription]        = useState(prefill.description || '');
+  const [urgencyLevel,       setUrgencyLevel]       = useState(prefill.urgencyLevel || 'medium');
   const [requesterLocation,  setRequesterLocation]  = useState(null);
   const [locationAddress,    setLocationAddress]    = useState('Detecting your location…');
   const [helpers,            setHelpers]            = useState([]);
   const [isSubmitting,       setIsSubmitting]       = useState(false);
   const [isDetecting,        setIsDetecting]        = useState(true);
+  const [aiTriageLoading,    setAiTriageLoading]    = useState(false);
+  const [aiTriageResult,     setAiTriageResult]     = useState(null);
 
   const authHeaders = useMemo(() => ({ Authorization: `Bearer ${token}` }), [token]);
 
@@ -97,6 +101,26 @@ export default function CreateEmergency() {
     );
   }
 
+  async function handleAutoTriage() {
+    if (!description.trim()) {
+      toast.error('Please enter a brief incident description before running AI Auto-Triage.');
+      return;
+    }
+    setAiTriageLoading(true);
+    try {
+      const res = await axios.post(`${API_URL}/ai/summarize`, { description: description.trim() }, { headers: authHeaders });
+      setAiTriageResult(res.data);
+      if (res.data?.suggested_urgency) {
+        setUrgencyLevel(res.data.suggested_urgency);
+      }
+      toast.success(`AI assessed priority as ${res.data.suggested_urgency?.toUpperCase()}. Priority adjusted.`);
+    } catch {
+      toast.error('AI Triage service temporarily unavailable. Please select urgency manually.');
+    } finally {
+      setAiTriageLoading(false);
+    }
+  }
+
   const selectedType = TYPES.find(t => t.value === emergencyType);
 
   return (
@@ -149,9 +173,23 @@ export default function CreateEmergency() {
 
         {/* Step 2 — Description */}
         <div className="card section-enter stagger-2" style={{ padding: '1.5rem' }}>
-          <label style={{ display: 'block', fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#8A8878', marginBottom: '0.625rem' }}>
-            2 — Incident Description & SitRep
-          </label>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.625rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <label style={{ display: 'block', fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#8A8878' }}>
+              2 — Incident Description & SitRep
+            </label>
+            <button
+              type="button"
+              onClick={handleAutoTriage}
+              disabled={aiTriageLoading || !description.trim()}
+              className="btn-secondary"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', padding: '0.25rem 0.65rem', fontSize: '0.75rem', fontWeight: 600 }}
+              title="Analyze situation description with AI to determine triage urgency level"
+            >
+              <Bot size={13} style={{ color: '#D93B2B' }} />
+              {aiTriageLoading ? 'Evaluating SitRep…' : '⚡ AI Auto-Triage'}
+            </button>
+          </div>
+
           <textarea
             rows={5}
             value={description}
@@ -160,9 +198,31 @@ export default function CreateEmergency() {
             className="input-field"
             style={{ resize: 'vertical', lineHeight: 1.6 }}
           />
+
           <p style={{ fontSize: '0.75rem', color: '#8A8878', marginTop: '0.375rem' }}>
             {description.length} characters — accurate reporting speeds response
           </p>
+
+          {aiTriageResult && (
+            <div style={{ marginTop: '0.75rem', padding: '0.75rem 1rem', background: '#F7F6F1', border: '1px solid #E4E2DA', borderRadius: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                <Bot size={13} style={{ color: '#D93B2B' }} />
+                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#0D0C0A' }}>AI Priority Assessment:</span>
+                <span style={{
+                  fontSize: '0.6875rem', fontWeight: 700, textTransform: 'uppercase',
+                  padding: '0.1rem 0.4rem', borderRadius: 4,
+                  background: aiTriageResult.suggested_urgency === 'high' ? '#FEF3F1' : '#EDF8F2',
+                  color: aiTriageResult.suggested_urgency === 'high' ? '#B02E20' : '#15663E',
+                  border: `1px solid ${aiTriageResult.suggested_urgency === 'high' ? '#F5C4BE' : '#A8DCBC'}`
+                }}>
+                  {aiTriageResult.suggested_urgency} Priority
+                </span>
+              </div>
+              <p style={{ fontSize: '0.75rem', color: '#5A5850', lineHeight: 1.5 }}>
+                {aiTriageResult.reasoning || aiTriageResult.summary}
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Step 3 — Urgency */}

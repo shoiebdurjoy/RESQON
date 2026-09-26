@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Bot, BrainCircuit, CheckCircle2, Clock3, Gauge, Loader2, Send, Users } from 'lucide-react';
+import { Bot, BrainCircuit, CheckCircle2, Clock3, Gauge, Loader2, Plus, Send, Users } from 'lucide-react';
 import AuthContext from '../context/AuthContext';
 import { useCountUp } from '../hooks/useCountUp';
 
@@ -33,6 +34,7 @@ function MetricCard({ label, value, unit, icon, accent, subtitle, animDelay = 0 
 }
 
 export default function AIAssistant() {
+  const navigate = useNavigate();
   const { token } = useContext(AuthContext);
 
   const [description, setDescription] = useState('');
@@ -155,6 +157,29 @@ export default function AIAssistant() {
                   <p style={{ fontSize: '0.875rem', color: '#2E2D2A', lineHeight: 1.6 }}>{aiResult.reasoning}</p>
                 </div>
               )}
+            </div>
+
+            {/* Direct Dispatch CTA */}
+            <div style={{ paddingTop: '0.75rem', borderTop: `1px solid ${urgencyMeta.border}`, display: 'flex', justifyContent: 'flex-end' }}>
+              <button
+                type="button"
+                onClick={() => {
+                  navigate('/emergency/create', {
+                    state: {
+                      description: aiResult.summary || description,
+                      urgencyLevel: aiResult.suggested_urgency,
+                    }
+                  });
+                }}
+                className="btn-primary"
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
+                  padding: '0.45rem 1rem', fontSize: '0.8125rem', fontWeight: 700,
+                  cursor: 'pointer',
+                }}
+              >
+                <Plus size={14} strokeWidth={2.5} /> Dispatch Incident with This Triage
+              </button>
             </div>
           </div>
         )}

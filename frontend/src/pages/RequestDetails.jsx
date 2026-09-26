@@ -1,5 +1,5 @@
 import { useContext, useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api';
@@ -217,10 +217,16 @@ export default function RequestDetails() {
             </div>
           </div>
 
-          <button onClick={() => navigate('/dashboard')} className="btn-ghost"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', padding: '0.375rem 0.875rem', fontSize: '0.8125rem', flexShrink: 0 }}>
-            <ArrowLeft size={13} /> Return
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+            <Link to={`/trends?id=${requestData.id}`} className="btn-secondary"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', padding: '0.375rem 0.875rem', fontSize: '0.8125rem', textDecoration: 'none' }}>
+              Lifecycle Audit
+            </Link>
+            <button onClick={() => navigate('/dashboard')} className="btn-ghost"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', padding: '0.375rem 0.875rem', fontSize: '0.8125rem', flexShrink: 0 }}>
+              <ArrowLeft size={13} /> Return
+            </button>
+          </div>
         </div>
 
         {/* Location row with Proximity calculation */}
@@ -256,8 +262,15 @@ export default function RequestDetails() {
             <User size={18} style={{ color: '#1854B4' }} />
           </div>
           <div style={{ flex: 1 }}>
-            <p style={{ fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#8A8878', marginBottom: '0.2rem' }}>Reporting Party</p>
-            <p style={{ fontWeight: 700, fontSize: '0.9375rem', color: '#0D0C0A', lineHeight: 1.2 }}>{requestData.requester?.name || 'N/A'}</p>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.35rem' }}>
+              <p style={{ fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#8A8878' }}>Reporting Party</p>
+              {requestData.requester?.blood_group && (
+                <span style={{ fontSize: '0.6875rem', fontWeight: 700, color: '#B02E20', background: '#FEF3F1', border: '1px solid #F5C4BE', padding: '0.05rem 0.35rem', borderRadius: 4 }}>
+                  🩸 {requestData.requester.blood_group}
+                </span>
+              )}
+            </div>
+            <p style={{ fontWeight: 700, fontSize: '0.9375rem', color: '#0D0C0A', lineHeight: 1.2, marginTop: '0.15rem' }}>{requestData.requester?.name || 'N/A'}</p>
             {requestData.requester?.phone && (
               <div style={{ marginTop: '0.35rem' }}>
                 <a
@@ -283,10 +296,26 @@ export default function RequestDetails() {
             <UserCheck size={18} style={{ color: requestData.helper ? '#1A7F4E' : '#8A8878' }} />
           </div>
           <div style={{ flex: 1 }}>
-            <p style={{ fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#8A8878', marginBottom: '0.2rem' }}>Assigned Response Unit</p>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.35rem' }}>
+              <p style={{ fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#8A8878' }}>Assigned Response Unit</p>
+              {requestData.helper?.blood_group && (
+                <span style={{ fontSize: '0.6875rem', fontWeight: 700, color: '#B02E20', background: '#FEF3F1', border: '1px solid #F5C4BE', padding: '0.05rem 0.35rem', borderRadius: 4 }}>
+                  🩸 {requestData.helper.blood_group}
+                </span>
+              )}
+            </div>
             {requestData.helper ? (
               <>
-                <p style={{ fontWeight: 700, fontSize: '0.9375rem', color: '#0D0C0A', lineHeight: 1.2 }}>{requestData.helper.name}</p>
+                <p style={{ fontWeight: 700, fontSize: '0.9375rem', color: '#0D0C0A', lineHeight: 1.2, marginTop: '0.15rem' }}>{requestData.helper.name}</p>
+                {Array.isArray(requestData.helper?.skills) && requestData.helper.skills.length > 0 && (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem', marginTop: '0.3rem' }}>
+                    {requestData.helper.skills.map(s => (
+                      <span key={s} style={{ fontSize: '0.625rem', fontWeight: 600, color: '#15663E', background: '#EDF8F2', border: '1px solid #A8DCBC', padding: '0.05rem 0.35rem', borderRadius: 3 }}>
+                        ✓ {s}
+                      </span>
+                    ))}
+                  </div>
+                )}
                 {requestData.helper.phone && (
                   <div style={{ marginTop: '0.35rem' }}>
                     <a
@@ -305,7 +334,7 @@ export default function RequestDetails() {
                 )}
               </>
             ) : (
-              <p style={{ fontWeight: 600, fontSize: '0.875rem', color: '#8A8878', fontStyle: 'italic' }}>No Unit Dispatched</p>
+              <p style={{ fontWeight: 600, fontSize: '0.875rem', color: '#8A8878', fontStyle: 'italic', marginTop: '0.15rem' }}>No Unit Dispatched</p>
             )}
           </div>
         </div>

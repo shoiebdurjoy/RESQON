@@ -1,7 +1,7 @@
 import { useContext, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { Bell, CheckCircle2, MessageSquare, XCircle } from 'lucide-react';
+import { Bell, CheckCircle2, Clock3, Filter, MessageSquare, Search, XCircle } from 'lucide-react';
 
 import AuthContext from '../context/AuthContext';
 
@@ -72,8 +72,28 @@ export default function NotificationHistory() {
     loadHistory();
   }, [token, authHeaders]);
 
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [searchQuery,  setSearchQuery]  = useState('');
+
   const completed = history.filter(h => String(h.request?.status).toLowerCase() === 'completed').length;
+  const accepted  = history.filter(h => String(h.request?.status).toLowerCase() === 'accepted').length;
+  const pending   = history.filter(h => String(h.request?.status).toLowerCase() === 'pending').length;
   const cancelled = history.filter(h => String(h.request?.status).toLowerCase() === 'cancelled').length;
+
+  const filteredHistory = useMemo(() => {
+    return history.filter(entry => {
+      const status = String(entry.request?.status || '').toLowerCase();
+      if (statusFilter !== 'all' && status !== statusFilter) return false;
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase().trim();
+        const idMatch = String(entry.request?.id).includes(q);
+        const descMatch = entry.request?.description?.toLowerCase().includes(q);
+        const typeMatch = entry.request?.emergency_type?.toLowerCase().includes(q);
+        return idMatch || descMatch || typeMatch;
+      }
+      return true;
+    });
+  }, [history, statusFilter, searchQuery]);
 
   return (
     <div className="page-enter" style={{ maxWidth: 1024, margin: '0 auto', padding: '2rem 1.5rem' }}>
@@ -87,19 +107,49 @@ export default function NotificationHistory() {
           Comprehensive operational audit trail of incident dispatches, response milestones, and tactical communications.
         </p>
 
-        {!isLoading && history.length > 0 && (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.625rem', marginTop: '1rem' }}>
-            {[
-              { icon: <Bell size={11} />,        label: `${history.length} total logged`, color: '#2E2D2A', bg: '#F7F6F1', border: '#D0CEC4' },
-              { icon: <CheckCircle2 size={11} />, label: `${completed} resolved`,         color: '#15663E', bg: '#EDF8F2', border: '#A8DCBC' },
-              { icon: <XCircle size={11} />,      label: `${cancelled} aborted`,          color: '#B02E20', bg: '#FEF3F1', border: '#F5C4BE' },
-            ].map(({ icon, label, color, bg, border }) => (
-              <span key={label} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.75rem', fontWeight: 600, color, background: bg, border: `1px solid ${border}`, borderRadius: 4, padding: '0.2rem 0.625rem' }}>
-                {icon} {label}
-              </span>
-            ))}
+        {/* Search & Filter Controls */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1.25rem' }}>
+          <div style={{ position: 'relative', maxWidth: 360 }}>
+            <Search size={14} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#8A8878' }} />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              placeholder="Search historical logs by ID or description…"
+              className="input-field"
+              style={{ paddingLeft: '2rem', fontSize: '0.8125rem' }}
+            />
           </div>
-        )}
+
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+            {[
+              { key: 'all',       label: `All Logs (${history.length})` },
+              { key: 'completed', label: `Resolved (${completed})` },
+              { key: 'accepted',  label: `Mobilized (${accepted})` },
+              { key: 'pending',   label: `Pending (${pending})` },
+              { key: 'cancelled', label: `Aborted (${cancelled})` },
+            ].map(pill => {
+              const active = statusFilter === pill.key;
+              return (
+                <button
+                  key={pill.key}
+                  type="button"
+                  onClick={() => setStatusFilter(pill.key)}
+                  style={{
+                    padding: '0.25rem 0.65rem', borderRadius: 99, fontSize: '0.75rem',
+                    fontWeight: 600, cursor: 'pointer', fontFamily: "'Sora', sans-serif",
+                    border: active ? '1px solid #0D0C0A' : '1px solid #D0CEC4',
+                    background: active ? '#0D0C0A' : '#FFFFFF',
+                    color: active ? '#FFFFFF' : '#5A5850',
+                    transition: 'all 0.12s ease',
+                  }}
+                >
+                  {pill.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
       {/* Loading */}
@@ -110,18 +160,29 @@ export default function NotificationHistory() {
       )}
 
       {/* Empty */}
-      {!isLoading && !history.length && (
+      {!isLoading && !filteredHistory.length && (
         <div className="fade-in" style={{ border: '1px dashed #D0CEC4', borderRadius: 10, background: '#F7F6F1', padding: '4rem 1.5rem', textAlign: 'center' }}>
           <p style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>📂</p>
           <p style={{ fontWeight: 700, fontSize: '0.9375rem', color: '#2E2D2A', marginBottom: '0.25rem' }}>No Incident Records Logged</p>
-          <p style={{ fontSize: '0.8125rem', color: '#8A8878' }}>Dispatched and resolved incident logs will appear here once recorded.</p>
+          <p style={{ fontSize: '0.8125rem', color: '#8A8878' }}>
+            {searchQuery || statusFilter !== 'all' ? 'No records match your search or filter parameters.' : 'Dispatched and resolved incident logs will appear here once recorded.'}
+          </p>
+          {(searchQuery || statusFilter !== 'all') && (
+            <button
+              onClick={() => { setSearchQuery(''); setStatusFilter('all'); }}
+              className="btn-secondary"
+              style={{ marginTop: '0.75rem', fontSize: '0.8125rem', padding: '0.35rem 0.85rem' }}
+            >
+              Reset Filters
+            </button>
+          )}
         </div>
       )}
 
       {/* History list — Task C: blur glass status cards */}
-      {!isLoading && history.length > 0 && (
+      {!isLoading && filteredHistory.length > 0 && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          {history.map((entry, i) => {
+          {filteredHistory.map((entry, i) => {
             const request  = entry.request  || {};
             const messages = entry.messages || [];
             const timeline = entry.status_timeline || {};
@@ -164,10 +225,16 @@ export default function NotificationHistory() {
                       </p>
                     </div>
                   </div>
-                  <Link to={`/emergency/${request.id}`} className="btn-primary"
-                    style={{ padding: '0.35rem 0.875rem', fontSize: '0.75rem', textDecoration: 'none', flexShrink: 0 }}>
-                    Incident File →
-                  </Link>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'wrap' }}>
+                    <Link to={`/trends?id=${request.id}`} className="btn-secondary"
+                      style={{ padding: '0.35rem 0.75rem', fontSize: '0.75rem', textDecoration: 'none', flexShrink: 0 }}>
+                      Lifecycle Audit
+                    </Link>
+                    <Link to={`/emergency/${request.id}`} className="btn-primary"
+                      style={{ padding: '0.35rem 0.875rem', fontSize: '0.75rem', textDecoration: 'none', flexShrink: 0 }}>
+                      Incident File →
+                    </Link>
+                  </div>
                 </div>
 
                 {/* Timeline cells */}

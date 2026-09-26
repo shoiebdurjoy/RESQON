@@ -1,12 +1,12 @@
 import { useContext, useEffect, useMemo, useState } from 'react';
 import { useCountUp } from '../hooks/useCountUp';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import {
-  AlertTriangle, CheckCircle2, ChevronRight, Clock3,
+  AlertTriangle, ArrowUpDown, CheckCircle2, ChevronRight, Clock3,
   FileCheck2, Filter, Navigation, PhoneCall, Plus, Search,
-  Volume2, Wifi, Zap
+  SlidersHorizontal, Volume2, Wifi, Zap
 } from 'lucide-react';
 
 import AuthContext from '../context/AuthContext';
@@ -169,12 +169,35 @@ function EmergencyCard({ item, onAccept, onReject, onComplete, onCancel, current
         </div>
       )}
 
+      {/* Responder / Requester credentials tags */}
+      {(item.requester?.blood_group || item.helper?.skills?.length > 0) && (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem', marginBottom: '0.75rem' }}>
+          {item.requester?.blood_group && (
+            <span style={{ fontSize: '0.6875rem', fontWeight: 700, color: '#B02E20', background: '#FEF3F1', border: '1px solid #F5C4BE', padding: '0.1rem 0.45rem', borderRadius: 4 }}>
+              🩸 {item.requester.blood_group}
+            </span>
+          )}
+          {Array.isArray(item.helper?.skills) && item.helper.skills.slice(0, 2).map(skill => (
+            <span key={skill} style={{ fontSize: '0.6875rem', fontWeight: 600, color: '#15663E', background: '#EDF8F2', border: '1px solid #A8DCBC', padding: '0.1rem 0.45rem', borderRadius: 4 }}>
+              ✓ {skill}
+            </span>
+          ))}
+        </div>
+      )}
+
       {/* Actions footer */}
-      <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', flexWrap: 'wrap' }}>
-        <Link to={`/emergency/${item.id}`}
-          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.2rem', fontSize: '0.8125rem', fontWeight: 600, color: '#D93B2B', textDecoration: 'none' }}>
-          Incident File <ChevronRight size={13} />
-        </Link>
+      <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', flexWrap: 'wrap', paddingTop: '0.6rem', borderTop: '1px solid #F0EFE9' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
+          <Link to={`/emergency/${item.id}`}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.2rem', fontSize: '0.8125rem', fontWeight: 600, color: '#D93B2B', textDecoration: 'none' }}>
+            Incident File <ChevronRight size={13} />
+          </Link>
+          <Link to={`/trends?id=${item.id}`}
+            title="Inspect incident lifecycle audit trail"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.2rem', fontSize: '0.6875rem', fontWeight: 600, color: '#1854B4', textDecoration: 'none', background: '#EBF2FC', border: '1px solid #B4CFF0', padding: '0.12rem 0.45rem', borderRadius: 4 }}>
+            Lifecycle Audit
+          </Link>
+        </div>
 
         <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
           {canAccept && (
@@ -226,6 +249,7 @@ function SkeletonCard() {
 export default function Dashboard() {
   const { user, token } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [communityRequests, setCommunityRequests] = useState([]);
   const [myRequests,        setMyRequests]        = useState([]);
@@ -235,7 +259,17 @@ export default function Dashboard() {
   const [statusFilter,      setStatusFilter]      = useState('pending');
   const [typeFilter,        setTypeFilter]        = useState('');
   const [dateFilter,        setDateFilter]        = useState('');
-  const [activeTab,         setActiveTab]         = useState('community'); // 'community' | 'mine'
+  const [activeTab,         setActiveTab]         = useState(() => searchParams.get('tab') === 'mine' ? 'mine' : 'community');
+  const [searchQuery,       setSearchQuery]       = useState('');
+  const [sortOrder,         setSortOrder]         = useState('urgency'); // 'urgency' | 'distance' | 'newest' | 'oldest'
+
+  // Sync tab with URL
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab === 'mine' || tab === 'community') {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
 
   const authHeaders = useMemo(() => ({ Authorization: `Bearer ${token}` }), [token]);
 
@@ -362,7 +396,47 @@ export default function Dashboard() {
     );
   }, [communityRequests]);
 
-  const listForCards = activeTab === 'community' ? communityRequests : myRequests;
+  const filteredAndSortedList = useMemo(() => {
+    let list = [...(activeTab === 'community' ? communityRequests : myRequests)];
+
+    // Live keyword filter
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      list = list.filter(item => {
+        const idMatch = String(item.id).includes(q);
+        const descMatch = item.description?.toLowerCase().includes(q);
+        const typeMatch = item.emergency_type?.toLowerCase().includes(q);
+        const reqMatch = item.requester?.name?.toLowerCase().includes(q) || item.requester?.blood_group?.toLowerCase().includes(q);
+        const helpMatch = item.helper?.name?.toLowerCase().includes(q);
+        return idMatch || descMatch || typeMatch || reqMatch || helpMatch;
+      });
+    }
+
+    // Sort order
+    const urgencyWeight = { high: 3, medium: 2, low: 1 };
+    list.sort((a, b) => {
+      if (sortOrder === 'urgency') {
+        const diff = (urgencyWeight[b.urgency_level?.toLowerCase()] || 0) - (urgencyWeight[a.urgency_level?.toLowerCase()] || 0);
+        if (diff !== 0) return diff;
+        return new Date(b.created_at) - new Date(a.created_at);
+      }
+      if (sortOrder === 'distance' && userLocation) {
+        const getRawDist = (it) => {
+          if (!it.latitude || !it.longitude) return Infinity;
+          const dy = it.latitude - userLocation.lat;
+          const dx = it.longitude - userLocation.lng;
+          return dy * dy + dx * dx;
+        };
+        return getRawDist(a) - getRawDist(b);
+      }
+      if (sortOrder === 'oldest') {
+        return new Date(a.created_at) - new Date(b.created_at);
+      }
+      return new Date(b.created_at) - new Date(a.created_at);
+    });
+
+    return list;
+  }, [activeTab, communityRequests, myRequests, searchQuery, sortOrder, userLocation]);
 
   return (
     <div className="page-enter" style={{ maxWidth: 1280, margin: '0 auto', padding: '2rem 1.5rem' }}>
@@ -426,7 +500,7 @@ export default function Dashboard() {
       {/* View Tabs */}
       <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.25rem', borderBottom: '1px solid #E4E2DA', paddingBottom: '0.5rem' }}>
         <button
-          onClick={() => setActiveTab('community')}
+          onClick={() => { setActiveTab('community'); setSearchParams({ tab: 'community' }); }}
           style={{
             background: activeTab === 'community' ? '#FEF3F1' : 'transparent',
             color: activeTab === 'community' ? '#D93B2B' : '#5A5850',
@@ -438,7 +512,7 @@ export default function Dashboard() {
           Active Incident Queue ({communityRequests.length})
         </button>
         <button
-          onClick={() => setActiveTab('mine')}
+          onClick={() => { setActiveTab('mine'); setSearchParams({ tab: 'mine' }); }}
           style={{
             background: activeTab === 'mine' ? '#FEF3F1' : 'transparent',
             color: activeTab === 'mine' ? '#D93B2B' : '#5A5850',
@@ -451,24 +525,53 @@ export default function Dashboard() {
         </button>
       </div>
 
-      {/* Filters (applicable to Community view) */}
-      {activeTab === 'community' && (
-        <div className="card" style={{ padding: '1rem 1.25rem', marginBottom: '1.5rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.75rem', fontSize: '0.8125rem', fontWeight: 600, color: '#2E2D2A' }}>
+      {/* Search & Operational Filters Bar */}
+      <div className="card" style={{ padding: '1rem 1.25rem', marginBottom: '1.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.8125rem', fontWeight: 600, color: '#2E2D2A' }}>
             <Filter size={14} style={{ color: '#8A8878' }} />
-            Filter Active Incidents
+            <span>Search & Dispatch Filters</span>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '0.625rem' }}>
-            <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="input-field" style={{ fontSize: '0.8125rem' }}>
-              {[['','All Statuses'],['pending','Awaiting Dispatch'],['accepted','Mobilized / Active'],['completed','Resolved'],['cancelled','Cancelled']].map(([v,l]) => <option key={v} value={v}>{l}</option>)}
-            </select>
-            <select value={typeFilter} onChange={e => setTypeFilter(e.target.value)} className="input-field" style={{ fontSize: '0.8125rem' }}>
-              {[['','All Classifications'],['blood','🩸 Blood'],['ambulance','🚑 Ambulance'],['oxygen','💨 Oxygen']].map(([v,l]) => <option key={v} value={v}>{l}</option>)}
-            </select>
-            <input type="date" value={dateFilter} onChange={e => setDateFilter(e.target.value)} className="input-field" style={{ fontSize: '0.8125rem' }} />
-          </div>
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.75rem', color: '#D93B2B', fontWeight: 600 }}
+            >
+              Clear Search ({filteredAndSortedList.length} matching)
+            </button>
+          )}
         </div>
-      )}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '0.625rem' }}>
+          <div style={{ position: 'relative' }}>
+            <Search size={14} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#8A8878' }} />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              placeholder="Search keyword, ID, blood..."
+              className="input-field"
+              style={{ paddingLeft: '2rem', fontSize: '0.8125rem' }}
+            />
+          </div>
+          <select value={sortOrder} onChange={e => setSortOrder(e.target.value)} className="input-field" style={{ fontSize: '0.8125rem' }}>
+            <option value="urgency">Sort: Priority Urgency (Default)</option>
+            {userLocation && <option value="distance">Sort: Nearest First (GPS)</option>}
+            <option value="newest">Sort: Newest First</option>
+            <option value="oldest">Sort: Oldest First</option>
+          </select>
+          {activeTab === 'community' && (
+            <>
+              <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="input-field" style={{ fontSize: '0.8125rem' }}>
+                {[['','All Statuses'],['pending','Awaiting Dispatch'],['accepted','Mobilized / Active'],['completed','Resolved'],['cancelled','Cancelled']].map(([v,l]) => <option key={v} value={v}>{l}</option>)}
+              </select>
+              <select value={typeFilter} onChange={e => setTypeFilter(e.target.value)} className="input-field" style={{ fontSize: '0.8125rem' }}>
+                {[['','All Classifications'],['blood','🩸 Blood'],['ambulance','🚑 Ambulance'],['oxygen','💨 Oxygen']].map(([v,l]) => <option key={v} value={v}>{l}</option>)}
+              </select>
+              <input type="date" value={dateFilter} onChange={e => setDateFilter(e.target.value)} className="input-field" style={{ fontSize: '0.8125rem' }} />
+            </>
+          )}
+        </div>
+      </div>
 
       {/* Loading */}
       {isLoading && (
@@ -478,9 +581,9 @@ export default function Dashboard() {
       )}
 
       {/* Emergency cards */}
-      {!isLoading && listForCards.length > 0 && (
+      {!isLoading && filteredAndSortedList.length > 0 && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '0.875rem', marginBottom: '2rem' }}>
-          {listForCards.map((item, i) => (
+          {filteredAndSortedList.map((item, i) => (
             <EmergencyCard
               key={item.id}
               item={item}
@@ -497,15 +600,24 @@ export default function Dashboard() {
         </div>
       )}
 
-      {!isLoading && !listForCards.length && (
+      {!isLoading && !filteredAndSortedList.length && (
         <div className="fade-in" style={{ border: '1px dashed #D0CEC4', borderRadius: 10, background: '#F7F6F1', padding: '3.5rem 1.5rem', textAlign: 'center', marginBottom: '2rem' }}>
           <Search size={28} style={{ margin: '0 auto 0.75rem', color: '#D0CEC4' }} />
           <p style={{ fontWeight: 600, color: '#5A5850', fontSize: '0.9375rem' }}>
-            {activeTab === 'community' ? 'No active incidents match current operational criteria' : 'No active incidents reported or response units currently assigned to you'}
+            {searchQuery ? `No incidents found matching "${searchQuery}"` : activeTab === 'community' ? 'No active incidents match current operational criteria' : 'No active incidents reported or response units currently assigned to you'}
           </p>
           <p style={{ fontSize: '0.8125rem', color: '#8A8878', marginTop: '0.25rem' }}>
-            {activeTab === 'community' ? 'Adjust filter parameters or monitor tactical frequency for incoming emergency dispatches.' : 'Incidents you report or response operations you accept will appear here.'}
+            {searchQuery ? 'Try clearing your search query or adjusting your filters.' : activeTab === 'community' ? 'Adjust filter parameters or monitor tactical frequency for incoming emergency dispatches.' : 'Incidents you report or response operations you accept will appear here.'}
           </p>
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="btn-secondary"
+              style={{ marginTop: '0.75rem', fontSize: '0.8125rem', padding: '0.35rem 0.85rem' }}
+            >
+              Reset Search
+            </button>
+          )}
         </div>
       )}
     </div>

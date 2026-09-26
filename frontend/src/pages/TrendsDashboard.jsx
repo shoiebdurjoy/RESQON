@@ -1,4 +1,5 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import { CalendarDays, CheckCircle2, Clock3, Search, TrendingUp } from 'lucide-react';
 import AuthContext from '../context/AuthContext';
@@ -48,6 +49,8 @@ function TimelineStage({ stage, isLast }) {
 
 export default function TrendsDashboard() {
   const { token } = useContext(AuthContext);
+  const [searchParams] = useSearchParams();
+  const auditSectionRef = useRef(null);
 
   const [trends,          setTrends]          = useState(null);
   const [trendsLoading,   setTrendsLoading]   = useState(true);
@@ -72,16 +75,29 @@ export default function TrendsDashboard() {
     loadTrends();
   }, [token]);
 
-  async function fetchTimeline() {
-    if (!requestId.trim()) return;
+  async function fetchTimeline(targetId) {
+    const idToFetch = (targetId != null ? String(targetId) : requestId).trim();
+    if (!idToFetch) return;
     setTimelineLoading(true); setTimelineError(''); setTimeline(null);
     try {
-      const res = await axios.get(`${API_URL}/emergency/${requestId.trim()}/timeline`, { headers });
+      const res = await axios.get(`${API_URL}/emergency/${idToFetch}/timeline`, { headers });
       setTimeline(res.data);
+      if (auditSectionRef.current) {
+        auditSectionRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
     } catch (err) {
       setTimelineError(err.response?.data?.error || 'Request not found or access denied.');
     } finally { setTimelineLoading(false); }
   }
+
+  // Auto-fetch if ?id= is passed in URL
+  useEffect(() => {
+    const urlId = searchParams.get('id');
+    if (urlId && token) {
+      setRequestId(urlId);
+      fetchTimeline(urlId);
+    }
+  }, [searchParams, token]);
 
   const typeEntries    = Object.entries(trends?.totals || {});
   const maxTrendsCount = typeEntries.length ? Math.max(...typeEntries.map(([,c]) => c), 1) : 1;
@@ -179,7 +195,7 @@ export default function TrendsDashboard() {
       </div>
 
       {/* ── Status Timeline ──────────────────────────────────────────── */}
-      <div className="card" style={{ padding: '1.5rem' }}>
+      <div ref={auditSectionRef} className="card" style={{ padding: '1.5rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.375rem' }}>
           <CheckCircle2 size={15} style={{ color: '#8A8878' }} />
           <p style={{ fontWeight: 700, fontSize: '0.9375rem', color: '#0D0C0A' }}>Incident Lifecycle Audit Trail</p>

@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import AuthContext from '../context/AuthContext';
 import { socket } from '../socket';
+import ProfileModal from './ProfileModal';
 
 const API_URL = `${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'}/api`;
 
@@ -50,8 +51,9 @@ export default function AppNavbar() {
   const [hasUnread,    setHasUnread]    = useState(false);
 
   // Dropdown menus
-  const [intelOpen,   setIntelOpen]   = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
+  const [intelOpen,        setIntelOpen]        = useState(false);
+  const [profileOpen,      setProfileOpen]      = useState(false);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
 
   const intelRef   = useRef(null);
   const profileRef = useRef(null);
@@ -428,6 +430,21 @@ export default function AppNavbar() {
                   <Activity size={13} /> Operations Console
                 </NavLink>
 
+                <button
+                  onClick={() => { setProfileOpen(false); setProfileModalOpen(true); }}
+                  style={{
+                    width: '100%', display: 'flex', alignItems: 'center', gap: '0.5rem',
+                    padding: '0.4rem 0.5rem', fontSize: '0.8125rem', color: '#5A5850',
+                    borderRadius: 6, border: 'none', background: 'transparent',
+                    cursor: 'pointer', fontFamily: "'Sora', sans-serif", fontWeight: 500,
+                    textAlign: 'left',
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.background = '#F7F6F1'}
+                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                >
+                  <User size={13} /> Qualifications & Profile
+                </button>
+
                 <div style={{ borderTop: '1px solid #F0EFE9', marginTop: '0.4rem', paddingTop: '0.4rem' }}>
                   <button
                     onClick={handleLogout}
@@ -574,6 +591,20 @@ export default function AppNavbar() {
             >
               <Bot size={16} /> AI Emergency Assistant
             </NavLink>
+
+            <button
+              onClick={() => { setMobileOpen(false); setProfileModalOpen(true); }}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '0.625rem',
+                padding: '0.6rem 0.75rem', borderRadius: 6,
+                fontSize: '0.875rem', fontWeight: 600,
+                color: '#2E2D2A', background: 'transparent', border: 'none',
+                cursor: 'pointer', width: '100%', textAlign: 'left',
+                fontFamily: "'Sora', sans-serif",
+              }}
+            >
+              <User size={16} /> Responder Qualifications & Profile
+            </button>
           </div>
 
           {/* User Signout Footer */}
@@ -596,6 +627,9 @@ export default function AppNavbar() {
           </div>
         </div>
       )}
+
+      {/* Responder Qualifications & Profile Modal */}
+      <ProfileModal isOpen={profileModalOpen} onClose={() => setProfileModalOpen(false)} />
     </nav>
   );
 }
