@@ -23,10 +23,9 @@
 
 ---
 
-## Live Demo
+## Repository
 
-- **Frontend**: https://smart-emergency-system-ses.vercel.app
-- **Backend**: https://smart-emergency-system-ses.onrender.com
+- **GitHub**: https://github.com/shoiebdurjoy/RESQON
 
 ---
 
