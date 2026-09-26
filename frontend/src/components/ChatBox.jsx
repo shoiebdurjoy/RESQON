@@ -2,9 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import axios from 'axios';
 import { io } from 'socket.io-client';
 import { Send } from 'lucide-react';
-
-const API_URL    = `${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'}/api`;
-const SOCKET_URL =  import.meta.env.VITE_BACKEND_URL   || 'http://localhost:5000';
+import { API_URL, SOCKET_URL } from '../config';
 
 export default function ChatBox({ requestId, token, currentUserId }) {
   const [messages, setMessages] = useState([]);

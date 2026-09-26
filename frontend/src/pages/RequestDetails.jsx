@@ -11,8 +11,7 @@ import AuthContext from '../context/AuthContext';
 import ChatBox from '../components/ChatBox';
 import StatusTimeline from '../components/StatusTimeline';
 import { socket } from '../socket';
-
-const API_URL = `${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'}/api`;
+import { API_URL } from '../config';
 
 const TYPE_META = {
   blood:     { icon: '🩸', accent: '#D93B2B' },

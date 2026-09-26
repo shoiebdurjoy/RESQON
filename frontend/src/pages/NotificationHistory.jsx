@@ -4,8 +4,7 @@ import axios from 'axios';
 import { Bell, CheckCircle2, Clock3, Filter, MessageSquare, Search, XCircle } from 'lucide-react';
 
 import AuthContext from '../context/AuthContext';
-
-const API_URL = `${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'}/api`;
+import { API_URL } from '../config';
 
 const TYPE_META = {
   blood:     { icon: '🩸', accent: '#D93B2B' },

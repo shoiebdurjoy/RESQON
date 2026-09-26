@@ -2,9 +2,7 @@ import { useContext, useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import { io } from 'socket.io-client';
 import AuthContext from '../context/AuthContext';
-
-const API_URL    = `${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'}/api`;
-const SOCKET_URL =  import.meta.env.VITE_BACKEND_URL   || 'http://localhost:5000';
+import { API_URL, SOCKET_URL } from '../config';
 
 export default function AvailabilityToggle() {
   const { token, user } = useContext(AuthContext);

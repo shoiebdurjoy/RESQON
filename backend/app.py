@@ -283,14 +283,38 @@ def create_app(config_name=None):
     
     # ---- Database Initialization ----
     
+    @app.route('/api/db-init', methods=['GET', 'POST'])
+    def db_init():
+        """Ensure all database tables are created."""
+        try:
+            from models import User, EmergencyRequest, Message
+            db.create_all()
+            return jsonify({
+                'status': 'success',
+                'message': 'Database tables verified and created successfully'
+            }), 200
+        except Exception as e:
+            app.logger.error(f'db_init endpoint failed: {e}')
+            return jsonify({'status': 'error', 'details': str(e)}), 500
+
+    _db_initialized = False
+
     @app.before_request
-    def before_request():
-        """Initialize database tables before first request"""
-        pass
+    def ensure_tables():
+        """Ensure database tables exist before processing requests"""
+        nonlocal _db_initialized
+        if not _db_initialized:
+            try:
+                from models import User, EmergencyRequest, Message
+                db.create_all()
+                _db_initialized = True
+            except Exception as e:
+                app.logger.warning(f'Lazy table initialization warning: {e}')
     
     # Create all database tables (graceful error handling if DB is temporarily unreachable)
     with app.app_context():
         try:
+            from models import User, EmergencyRequest, Message
             db.create_all()
             app.logger.info(f'Database initialized for {config_name} environment')
         except Exception as e:

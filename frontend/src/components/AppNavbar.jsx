@@ -9,8 +9,7 @@ import {
 import AuthContext from '../context/AuthContext';
 import { socket } from '../socket';
 import ProfileModal from './ProfileModal';
-
-const API_URL = `${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'}/api`;
+import { API_URL } from '../config';
 
 const INTEL_ITEMS = [
   {

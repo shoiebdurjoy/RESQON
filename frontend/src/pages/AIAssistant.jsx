@@ -4,8 +4,7 @@ import axios from 'axios';
 import { Bot, BrainCircuit, CheckCircle2, Clock3, Gauge, Loader2, Plus, Send, Users } from 'lucide-react';
 import AuthContext from '../context/AuthContext';
 import { useCountUp } from '../hooks/useCountUp';
-
-const API_URL = `${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'}/api`;
+import { API_URL } from '../config';
 
 /* Task H: urgency-dependent light theme colors */
 const URGENCY_META = {

@@ -6,8 +6,8 @@ import { ArrowLeft, Bot, Crosshair, MapPin, Sparkles } from 'lucide-react';
 
 import AuthContext from '../context/AuthContext';
 import MapView from '../components/MapView';
+import { API_URL } from '../config';
 
-const API_URL = `${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'}/api`;
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
 
 const TYPES = [

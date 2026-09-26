@@ -3,8 +3,7 @@ import axios from 'axios';
 import { Activity, AlertTriangle, CheckCircle2, Clock3, Users, XCircle } from 'lucide-react';
 import AuthContext from '../context/AuthContext';
 import { useCountUp } from '../hooks/useCountUp';
-
-const API_URL = `${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'}/api`;
+import { API_URL } from '../config';
 
 const TYPE_ICON  = { blood: '🩸', ambulance: '🚑', oxygen: '💨' };
 const TYPE_BAR   = { blood: '#D93B2B', ambulance: '#1854B4', oxygen: '#0891B2' };

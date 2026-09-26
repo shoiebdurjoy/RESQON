@@ -1,8 +1,8 @@
 import { createContext, useContext, useMemo, useState } from 'react';
 import axios from 'axios';
+import { API_URL } from '../config';
 
 const AuthContext = createContext(null);
-const API_URL = `${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'}/api`;
 
 function decodeJwtPayload(jwtToken) {
   try {

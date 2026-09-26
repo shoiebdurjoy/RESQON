@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Eye, EyeOff, Zap } from 'lucide-react';
+import { API_URL } from '../config';
 
-const API_URL = `${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'}/api`;
 const BLOOD_GROUPS   = ['A+','A-','B+','B-','AB+','AB-','O+','O-'];
 const SKILLS_OPTIONS = ['First Aid','CPR','Driving','Medical','Oxygen Delivery','Blood Donation'];
 

@@ -3,8 +3,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { AlertOctagon, ArrowUpDown, Clock3, RefreshCw, ShieldAlert, Users } from 'lucide-react';
 import AuthContext from '../context/AuthContext';
-
-const API_URL = `${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'}/api`;
+import { API_URL } from '../config';
 
 const TYPE_ICON = { blood: '🩸', ambulance: '🚑', oxygen: '💨' };
 

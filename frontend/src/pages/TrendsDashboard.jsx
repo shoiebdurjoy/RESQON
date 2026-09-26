@@ -3,8 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import { CalendarDays, CheckCircle2, Clock3, Search, TrendingUp } from 'lucide-react';
 import AuthContext from '../context/AuthContext';
-
-const API_URL = `${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'}/api`;
+import { API_URL } from '../config';
 
 /* Task F: emoji+text map for proper alignment */
 const TYPE_ICON = { blood: '🩸', ambulance: '🚑', oxygen: '💨' };
