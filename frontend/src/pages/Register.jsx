@@ -32,7 +32,13 @@ export default function Register() {
       await axios.post(`${API_URL}/auth/register`, payload);
       navigate('/login');
     } catch (err) {
-      setError(err.response?.data?.error || 'Registration failed. Please try again.');
+      if (err.response?.status === 503 || (typeof err.response?.data === 'string' && err.response.data.includes('suspended'))) {
+        setError('The backend server on Render is currently suspended. Please resume the service in your Render dashboard.');
+      } else if (err.code === 'ERR_NETWORK' || !err.response) {
+        setError('Cannot connect to the backend server. It may be offline or suspended on Render.');
+      } else {
+        setError(err.response?.data?.error || 'Registration failed. Please try again.');
+      }
     } finally { setLoading(false); }
   }
 

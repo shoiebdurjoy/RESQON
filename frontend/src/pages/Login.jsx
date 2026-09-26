@@ -13,9 +13,20 @@ export default function Login() {
 
   async function handleSubmit(e) {
     e.preventDefault(); setError(''); setLoading(true);
-    try { await login(email, password); navigate('/dashboard'); }
-    catch (err) { setError(err.response?.data?.error || 'Login failed. Check your credentials.'); }
-    finally { setLoading(false); }
+    try { 
+      await login(email, password); 
+      navigate('/dashboard'); 
+    } catch (err) { 
+      if (err.response?.status === 503 || (typeof err.response?.data === 'string' && err.response.data.includes('suspended'))) {
+        setError('The backend server on Render is currently suspended. Please resume the service in your Render dashboard.');
+      } else if (err.code === 'ERR_NETWORK' || !err.response) {
+        setError('Cannot connect to the backend server. It may be offline or suspended on Render.');
+      } else {
+        setError(err.response?.data?.error || 'Login failed. Check your credentials.');
+      }
+    } finally { 
+      setLoading(false); 
+    }
   }
 
   return (
