@@ -29,8 +29,8 @@ bp = Blueprint('member2_role', __name__)
 
 def helper_required(fn):
     """
-    Decorator that requires JWT token and helper role.
-    Stores current helper in g for downstream handlers.
+    Decorator that requires JWT token and active user.
+    Stores current user in g for downstream handlers.
     """
     @wraps(fn)
     @jwt_required()
@@ -41,10 +41,8 @@ def helper_required(fn):
         if not user:
             return jsonify({'error': 'User not found'}), 404
         
-        if user.role != UserRole.HELPER:
-            return jsonify({'error': 'Forbidden: helper role required'}), 403
-        
         g.current_helper = user
+        g.current_user = user
         return fn(*args, **kwargs)
     
     return decorated
@@ -52,8 +50,8 @@ def helper_required(fn):
 
 def requester_required(fn):
     """
-    Decorator that requires JWT token and requester role.
-    Stores current requester in g for downstream handlers.
+    Decorator that requires JWT token and active user.
+    Stores current user in g for downstream handlers.
     """
     @wraps(fn)
     @jwt_required()
@@ -64,10 +62,8 @@ def requester_required(fn):
         if not user:
             return jsonify({'error': 'User not found'}), 404
         
-        if user.role != UserRole.REQUESTER:
-            return jsonify({'error': 'Forbidden: requester role required'}), 403
-        
         g.current_requester = user
+        g.current_user = user
         return fn(*args, **kwargs)
     
     return decorated

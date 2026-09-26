@@ -9,6 +9,7 @@ from functools import wraps
 
 from flask import Blueprint, request, jsonify, g
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from sqlalchemy import or_
 from twilio.base.exceptions import TwilioRestException
 from twilio.rest import Client
 
@@ -80,7 +81,7 @@ def _send_sms(to_phone, body):
 
 def requester_required(fn):
     """
-    Decorator that requires a valid JWT token and requester role.
+    Decorator that requires a valid JWT token and active user.
     """
     @wraps(fn)
     @jwt_required()
@@ -93,12 +94,9 @@ def requester_required(fn):
         if not user:
             return jsonify({'error': 'User not found'}), 404
 
-        # Enforce requester-only role access.
-        if user.role != UserRole.REQUESTER:
-            return jsonify({'error': 'Forbidden: requester role required'}), 403
-
-        # Save current requester on flask.g for downstream route handlers.
+        # Save current user on flask.g for downstream route handlers.
         g.current_requester = user
+        g.current_user = user
         return fn(*args, **kwargs)
 
     return wrapped
@@ -106,7 +104,7 @@ def requester_required(fn):
 
 def helper_required(fn):
     """
-    Decorator that requires a valid JWT token and helper role.
+    Decorator that requires a valid JWT token and active user.
     """
     @wraps(fn)
     @jwt_required()
@@ -119,12 +117,9 @@ def helper_required(fn):
         if not user:
             return jsonify({'error': 'User not found'}), 404
 
-        # Enforce helper-only role access.
-        if user.role != UserRole.HELPER:
-            return jsonify({'error': 'Forbidden: helper role required'}), 403
-
-        # Save current helper on flask.g for downstream route handlers.
+        # Save current user on flask.g for downstream route handlers.
         g.current_helper = user
+        g.current_user = user
         return fn(*args, **kwargs)
 
     return wrapped
@@ -262,13 +257,15 @@ def get_my_emergency_requests():
     if not user:
         return jsonify({'error': 'User not found'}), 404
 
-    # Branch query behavior by role.
-    if user.role == UserRole.REQUESTER:
+    scope = request.args.get('scope')
+    if scope == 'created':
         query = EmergencyRequest.query.filter(EmergencyRequest.requester_id == user.id)
-    elif user.role == UserRole.HELPER:
+    elif scope == 'assigned':
         query = EmergencyRequest.query.filter(EmergencyRequest.helper_id == user.id)
     else:
-        return jsonify({'error': 'Unsupported user role'}), 403
+        query = EmergencyRequest.query.filter(
+            or_(EmergencyRequest.requester_id == user.id, EmergencyRequest.helper_id == user.id)
+        )
 
     try:
         # Sort by most recently created request first.
@@ -317,6 +314,10 @@ def accept_emergency_request(request_id):
     # Only pending requests can be accepted.
     if emergency.status != EmergencyStatus.PENDING:
         return jsonify({'error': 'Only pending requests can be accepted'}), 400
+
+    # User cannot accept their own emergency request
+    if emergency.requester_id == helper.id:
+        return jsonify({'error': 'You cannot accept your own emergency request'}), 400
 
     # Assign the current helper and transition status.
     emergency.helper_id = helper.id
@@ -390,13 +391,13 @@ def complete_emergency_request(request_id):
     if not emergency:
         return jsonify({'error': 'Emergency request not found'}), 404
 
-    # Only assigned helper may complete the request.
-    if emergency.helper_id != helper.id:
-        return jsonify({'error': 'Forbidden: request is not assigned to you'}), 403
+    # Only assigned helper or original requester may complete the request.
+    if emergency.helper_id != helper.id and emergency.requester_id != helper.id:
+        return jsonify({'error': 'Forbidden: only requester or assigned helper can complete this request'}), 403
 
-    # Only accepted requests can transition to completed.
-    if emergency.status != EmergencyStatus.ACCEPTED:
-        return jsonify({'error': 'Only accepted requests can be completed'}), 400
+    # Only active requests can transition to completed.
+    if emergency.status not in (EmergencyStatus.ACCEPTED, EmergencyStatus.PENDING):
+        return jsonify({'error': 'Only active requests can be completed'}), 400
 
     # Transition request state to completed and set completion timestamp.
     emergency.status = EmergencyStatus.COMPLETED
@@ -450,24 +451,16 @@ def cancel_emergency_request(request_id):
     if not emergency:
         return jsonify({'error': 'Emergency request not found'}), 404
 
-    if user.role == UserRole.REQUESTER:
-        # Ensure only creator requester can cancel this request.
-        if emergency.requester_id != user.id:
-            return jsonify({'error': 'Forbidden: you can only cancel your own request'}), 403
-
-        # Do not allow canceling already completed/cancelled requests.
+    if emergency.requester_id == user.id:
+        # Creator requester can cancel this request.
         if emergency.status in (EmergencyStatus.COMPLETED, EmergencyStatus.CANCELLED):
             return jsonify({'error': 'Request cannot be cancelled in its current status'}), 400
 
         # Transition request status to cancelled.
         emergency.status = EmergencyStatus.CANCELLED
 
-    elif user.role == UserRole.HELPER:
-        # Helper can only cancel assignment if this request is assigned to them.
-        if emergency.helper_id != user.id:
-            return jsonify({'error': 'Forbidden: request is not assigned to you'}), 403
-
-        # Helper can only cancel assignment when request is in accepted state.
+    elif emergency.helper_id == user.id:
+        # Helper can cancel assignment when request is in accepted state.
         if emergency.status != EmergencyStatus.ACCEPTED:
             return jsonify({'error': 'Only accepted requests can be cancelled by helper'}), 400
 
@@ -477,7 +470,7 @@ def cancel_emergency_request(request_id):
         emergency.accepted_at = None
 
     else:
-        return jsonify({'error': 'Unsupported user role'}), 403
+        return jsonify({'error': 'Forbidden: you are not a participant in this request'}), 403
 
     try:
         # Persist cancellation state.

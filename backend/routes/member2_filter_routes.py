@@ -12,6 +12,7 @@ from datetime import datetime
 
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from sqlalchemy import or_
 
 from extensions import db
 from models import User, UserRole, EmergencyRequest, EmergencyType, EmergencyStatus
@@ -135,13 +136,16 @@ def get_my_emergency_requests():
     if not user:
         return jsonify({'error': 'User not found'}), 404
     
-    # Branch query behavior by role
-    if user.role == UserRole.REQUESTER:
+    # Support filtering by scope ('created' or 'assigned'), default to both
+    scope = request.args.get('scope')
+    if scope == 'created':
         query = EmergencyRequest.query.filter(EmergencyRequest.requester_id == user.id)
-    elif user.role == UserRole.HELPER:
+    elif scope == 'assigned':
         query = EmergencyRequest.query.filter(EmergencyRequest.helper_id == user.id)
     else:
-        return jsonify({'error': 'Unsupported user role'}), 403
+        query = EmergencyRequest.query.filter(
+            or_(EmergencyRequest.requester_id == user.id, EmergencyRequest.helper_id == user.id)
+        )
     
     try:
         requests = query.order_by(EmergencyRequest.created_at.desc()).all()

@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api';
-import { ArrowLeft, MapPin, User, UserCheck } from 'lucide-react';
+import { ArrowLeft, MapPin, Navigation, PhoneCall, User, UserCheck } from 'lucide-react';
 
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
 
@@ -49,11 +49,34 @@ export default function RequestDetails() {
   const navigate = useNavigate();
   const { user, token, isHelper, isRequester } = useContext(AuthContext);
 
-  const [requestData,  setRequestData]  = useState(null);
-  const [isLoading,    setIsLoading]    = useState(true);
+  const [requestData,   setRequestData]   = useState(null);
+  const [isLoading,     setIsLoading]     = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
+  const [userLocation,  setUserLocation]  = useState(null);
 
   const headers = useMemo(() => ({ Authorization: `Bearer ${token}` }), [token]);
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        () => {}
+      );
+    }
+  }, []);
+
+  function getDistanceKm(lat1, lon1, lat2, lon2) {
+    if (!lat1 || !lon1 || !lat2 || !lon2) return null;
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const d = R * c;
+    return d < 1 ? '< 1 km away' : `${d.toFixed(1)} km away`;
+  }
 
   async function fetchRequest() {
     setIsLoading(true);
@@ -85,12 +108,20 @@ export default function RequestDetails() {
   async function runAction(path) {
     setActionLoading(true);
     try {
-      await axios.put(`${API_URL}/emergency/${id}/${path}`, {}, { headers });
+      let payload = {};
+      if (path === 'complete') {
+        const note = window.prompt('Optional: Enter resolution summary (e.g. medical aid given, patient transported safely):');
+        if (note !== null && note.trim()) {
+          payload.resolution_note = note.trim();
+        }
+      }
+      await axios.put(`${API_URL}/emergency/${id}/${path}`, payload, { headers });
       if (path === 'reject') {
         toast.success('Request rejected.');
         navigate('/dashboard');
         return;
       }
+      toast.success(path === 'complete' ? 'Request marked as completed!' : 'Status updated.');
       await fetchRequest();
     } catch (err) {
       toast.error(err.response?.data?.error || 'Action failed.');
@@ -138,16 +169,20 @@ export default function RequestDetails() {
   const status      = String(requestData.status || '').toLowerCase();
   const typeMeta    = TYPE_META[requestData.emergency_type] || { icon: '🆘', accent: '#8A8878' };
   const urgencyDot  = URGENCY_DOT[requestData.urgency_level] || '#8A8878';
-  const isAssignedHelper = isHelper && String(requestData.helper?.id) === String(user?.id);
-  const isParticipant = isRequester
-    ? String(requestData.requester?.id) === String(user?.id)
-    : isAssignedHelper;
+
+  const currentUserId = Number(user?.id);
+  const requesterId = Number(requestData.requester?.id);
+  const helperId = Number(requestData.helper?.id);
+
+  const isRequesterUser = currentUserId === requesterId;
+  const isAssignedHelper = Boolean(helperId && currentUserId === helperId);
+  const isParticipant = isRequesterUser || isAssignedHelper;
+
   const showChat = isParticipant && status !== 'cancelled' && status !== 'pending';
-  const helperCanDecide  = isHelper && status === 'pending';
-  const helperCanComplete = isHelper && status === 'accepted' && Number(requestData.helper?.id) === Number(user?.id);
-  const helperCanCancel  = isHelper && status === 'accepted' && Number(requestData.helper?.id) === Number(user?.id);
-  const requesterCanCancel = isRequester && status === 'pending' && Number(requestData.requester?.id) === Number(user?.id);
-  const hasActions = helperCanDecide || helperCanComplete || helperCanCancel || requesterCanCancel;
+  const canAccept = status === 'pending' && !isRequesterUser;
+  const canComplete = status === 'accepted' && (isAssignedHelper || isRequesterUser);
+  const canCancel = (status === 'pending' && isRequesterUser) || (status === 'accepted' && (isAssignedHelper || isRequesterUser));
+  const hasActions = canAccept || canComplete || canCancel;
 
   return (
     <div style={{ maxWidth: 1024, margin: '0 auto', padding: '2rem 1.5rem' }}>
@@ -188,16 +223,29 @@ export default function RequestDetails() {
           </button>
         </div>
 
-        {/* Location row */}
-        <div style={{ marginTop: '1rem', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', color: '#8A8878' }}>
-          <MapPin size={12} />
-          <span>{Number(requestData.latitude).toFixed(5)}, {Number(requestData.longitude).toFixed(5)}</span>
-          {requestData.created_at && (
-            <span style={{ marginLeft: '0.25rem' }}>
-              · Created {new Date(requestData.created_at).toLocaleString()}
+        {/* Location row with Proximity calculation */}
+        <div style={{ marginTop: '1rem', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0.625rem', fontSize: '0.75rem', color: '#8A8878' }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+            <MapPin size={12} />
+            <span>{Number(requestData.latitude).toFixed(5)}, {Number(requestData.longitude).toFixed(5)}</span>
+          </span>
+          {userLocation && (
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', color: '#1854B4', fontWeight: 600, background: '#EBF2FC', padding: '0.12rem 0.45rem', borderRadius: 4 }}>
+              <Navigation size={11} />
+              {getDistanceKm(userLocation.lat, userLocation.lng, requestData.latitude, requestData.longitude)}
             </span>
           )}
+          {requestData.created_at && (
+            <span>· Created {new Date(requestData.created_at).toLocaleString()}</span>
+          )}
         </div>
+
+        {requestData.resolution_note && (
+          <div style={{ marginTop: '0.875rem', padding: '0.75rem 1rem', background: '#EDF8F2', border: '1px solid #A8DCBC', borderRadius: 8 }}>
+            <p style={{ fontSize: '0.6875rem', fontWeight: 700, color: '#15663E', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.2rem' }}>Resolution Summary</p>
+            <p style={{ fontSize: '0.8125rem', color: '#0D0C0A' }}>{requestData.resolution_note}</p>
+          </div>
+        )}
       </div>
 
       {/* ── People cards ─────────────────────────────────────────────── */}
@@ -207,11 +255,24 @@ export default function RequestDetails() {
           <div style={{ width: 40, height: 40, borderRadius: 8, background: '#EBF2FC', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
             <User size={18} style={{ color: '#1854B4' }} />
           </div>
-          <div>
+          <div style={{ flex: 1 }}>
             <p style={{ fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#8A8878', marginBottom: '0.2rem' }}>Requester</p>
             <p style={{ fontWeight: 700, fontSize: '0.9375rem', color: '#0D0C0A', lineHeight: 1.2 }}>{requestData.requester?.name || 'N/A'}</p>
             {requestData.requester?.phone && (
-              <p style={{ fontSize: '0.75rem', color: '#5A5850', marginTop: '0.1rem' }}>{requestData.requester.phone}</p>
+              <div style={{ marginTop: '0.35rem' }}>
+                <a
+                  href={`tel:${requestData.requester.phone}`}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: '0.3rem',
+                    padding: '0.25rem 0.6rem', fontSize: '0.75rem', fontWeight: 600,
+                    color: '#1854B4', background: '#EBF2FC', border: '1px solid #B4CFF0',
+                    borderRadius: 6, textDecoration: 'none'
+                  }}
+                  title="Direct Phone Call"
+                >
+                  <PhoneCall size={11} /> Call {requestData.requester.phone}
+                </a>
+              </div>
             )}
           </div>
         </div>
@@ -221,13 +282,26 @@ export default function RequestDetails() {
           <div style={{ width: 40, height: 40, borderRadius: 8, background: requestData.helper ? '#EDF8F2' : '#F7F6F1', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
             <UserCheck size={18} style={{ color: requestData.helper ? '#1A7F4E' : '#8A8878' }} />
           </div>
-          <div>
-            <p style={{ fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#8A8878', marginBottom: '0.2rem' }}>Helper</p>
+          <div style={{ flex: 1 }}>
+            <p style={{ fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#8A8878', marginBottom: '0.2rem' }}>Helper / Responder</p>
             {requestData.helper ? (
               <>
                 <p style={{ fontWeight: 700, fontSize: '0.9375rem', color: '#0D0C0A', lineHeight: 1.2 }}>{requestData.helper.name}</p>
                 {requestData.helper.phone && (
-                  <p style={{ fontSize: '0.75rem', color: '#5A5850', marginTop: '0.1rem' }}>{requestData.helper.phone}</p>
+                  <div style={{ marginTop: '0.35rem' }}>
+                    <a
+                      href={`tel:${requestData.helper.phone}`}
+                      style={{
+                        display: 'inline-flex', alignItems: 'center', gap: '0.3rem',
+                        padding: '0.25rem 0.6rem', fontSize: '0.75rem', fontWeight: 600,
+                        color: '#15663E', background: '#EDF8F2', border: '1px solid #A8DCBC',
+                        borderRadius: 6, textDecoration: 'none'
+                      }}
+                      title="Direct Phone Call"
+                    >
+                      <PhoneCall size={11} /> Call {requestData.helper.phone}
+                    </a>
+                  </div>
                 )}
               </>
             ) : (
@@ -238,10 +312,10 @@ export default function RequestDetails() {
       </div>
 
       {/* ── Requester Location Map ───────────────────────────────────── */}
-      {(isHelper || isParticipant) && requestData.latitude && requestData.longitude && (
+      {requestData.latitude && requestData.longitude && (
         <div className="card" style={{ padding: '1.25rem', marginBottom: '1.25rem' }}>
           <p style={{ fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#8A8878', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
-            <MapPin size={12} /> Requester Location
+            <MapPin size={12} /> Incident Location
           </p>
           <RequesterMap lat={requestData.latitude} lng={requestData.longitude} />
           <p style={{ fontSize: '0.75rem', color: '#8A8878', marginTop: '0.5rem', fontVariantNumeric: 'tabular-nums' }}>
@@ -253,32 +327,29 @@ export default function RequestDetails() {
       {/* ── Actions ──────────────────────────────────────────────────── */}
       {hasActions && (
         <div className="card" style={{ padding: '1rem 1.25rem', marginBottom: '1.25rem' }}>
-          <p style={{ fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#8A8878', marginBottom: '0.75rem' }}>Actions</p>
+          <p style={{ fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#8A8878', marginBottom: '0.75rem' }}>Emergency Actions</p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.625rem' }}>
-            {helperCanDecide && (
+            {canAccept && (
               <>
                 <button onClick={() => runAction('accept')} disabled={actionLoading} className="btn-success"
                   style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem' }}>
-                  Accept Request
+                  Accept & Help
                 </button>
                 <button onClick={() => runAction('reject')} disabled={actionLoading} className="btn-ghost">
-                  Reject
+                  Pass
                 </button>
               </>
             )}
-            {helperCanComplete && (
-              <button onClick={() => runAction('complete')} disabled={actionLoading} className="btn-success">
-                Mark Complete
+            {canComplete && (
+              <button onClick={() => runAction('complete')} disabled={actionLoading} className="btn-success"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem' }}>
+                Mark Resolved / Complete
               </button>
             )}
-            {helperCanCancel && (
-              <button onClick={() => runAction('cancel')} disabled={actionLoading} className="btn-danger">
-                Cancel Assignment
-              </button>
-            )}
-            {requesterCanCancel && (
-              <button onClick={() => runAction('cancel')} disabled={actionLoading} className="btn-danger">
-                Cancel Request
+            {canCancel && (
+              <button onClick={() => runAction('cancel')} disabled={actionLoading} className="btn-danger"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem' }}>
+                {isRequesterUser ? 'Cancel Emergency' : 'Withdraw Assignment'}
               </button>
             )}
             {actionLoading && (

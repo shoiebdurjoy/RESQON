@@ -74,7 +74,7 @@ function AppRoutes() {
       <Route
         path="/emergency/create"
         element={
-          <PrivateRoute role="requester">
+          <PrivateRoute role="any">
             <CreateEmergency />
           </PrivateRoute>
         }

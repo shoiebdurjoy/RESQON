@@ -57,7 +57,7 @@ def _send_sms(to_phone, body):
 
 
 def helper_required(fn):
-    """Decorator that requires JWT token and helper role."""
+    """Decorator that requires JWT token and retrieves user."""
     @wraps(fn)
     @jwt_required()
     def wrapped(*args, **kwargs):
@@ -67,10 +67,8 @@ def helper_required(fn):
         if not user:
             return jsonify({'error': 'User not found'}), 404
         
-        if user.role != UserRole.HELPER:
-            return jsonify({'error': 'Forbidden: helper role required'}), 403
-        
         g.current_helper = user
+        g.current_user = user
         return fn(*args, **kwargs)
     
     return wrapped
@@ -107,7 +105,7 @@ def accept_emergency_request(request_id):
     """
     Assign helper and mark request as ACCEPTED.
     
-    Access: Helper only
+    Access: Any registered user (except the creator of this emergency)
     Preconditions: Request must be in PENDING status
     
     Returns:
@@ -124,6 +122,9 @@ def accept_emergency_request(request_id):
     
     if emergency.status != EmergencyStatus.PENDING:
         return jsonify({'error': 'Only pending requests can be accepted'}), 400
+    
+    if emergency.requester_id == helper.id:
+        return jsonify({'error': 'You cannot accept your own emergency request'}), 400
     
     emergency.helper_id = helper.id
     emergency.status = EmergencyStatus.ACCEPTED
@@ -197,10 +198,10 @@ def reject_emergency_request(request_id):
 @helper_required
 def complete_emergency_request(request_id):
     """
-    Mark accepted request as COMPLETED by assigned helper.
+    Mark active request as COMPLETED by assigned helper or original requester.
     
-    Access: Assigned helper only
-    Preconditions: Request must be in ACCEPTED status and assigned to calling helper
+    Access: Assigned helper or requester
+    Preconditions: Request must be in ACCEPTED or PENDING status
     
     Returns:
         JSON: {
@@ -208,18 +209,21 @@ def complete_emergency_request(request_id):
             'request': { ...updated_emergency_data... }
         }, 200
     """
-    helper = g.current_helper
+    user = g.current_helper
     
     emergency = EmergencyRequest.query.get(request_id)
     if not emergency:
         return jsonify({'error': 'Emergency request not found'}), 404
     
-    if emergency.helper_id != helper.id:
-        return jsonify({'error': 'Forbidden: request is not assigned to you'}), 403
+    if emergency.helper_id != user.id and emergency.requester_id != user.id:
+        return jsonify({'error': 'Forbidden: only requester or assigned helper can complete this request'}), 403
     
-    if emergency.status != EmergencyStatus.ACCEPTED:
-        return jsonify({'error': 'Only accepted requests can be completed'}), 400
+    if emergency.status not in (EmergencyStatus.ACCEPTED, EmergencyStatus.PENDING):
+        return jsonify({'error': 'Only active requests can be completed'}), 400
     
+    data = request.get_json(silent=True) or {}
+    resolution_note = str(data.get('resolution_note', '')).strip() if data else ''
+
     emergency.status = EmergencyStatus.COMPLETED
     emergency.completed_at = datetime.utcnow()
     
@@ -233,19 +237,24 @@ def complete_emergency_request(request_id):
     socketio.emit('request_status_updated', {
         'request_id': emergency.id,
         'status': emergency.status.value,
-        'helper_id': helper.id,
+        'helper_id': emergency.helper_id,
+        'resolution_note': resolution_note or None,
     })
     
     # Send SMS notification
     requester = emergency.requester
     _send_sms(
         requester.phone if requester else None,
-        'Your request has been completed.',
+        'Your emergency request has been completed.',
     )
     
+    resp_dict = emergency.to_dict()
+    if resolution_note:
+        resp_dict['resolution_note'] = resolution_note
+
     return jsonify({
         'message': 'Emergency request completed successfully',
-        'request': emergency.to_dict(),
+        'request': resp_dict,
     }), 200
 
 
@@ -257,13 +266,13 @@ def complete_emergency_request(request_id):
 @jwt_required()
 def cancel_emergency_request(request_id):
     """
-    Cancel behavior by role:
-    - Requester: cancel own pending request (status -> CANCELLED)
-    - Helper: cancel own accepted assignment (status -> PENDING, helper_id -> NULL)
+    Cancel behavior:
+    - Creator: cancel own non-completed request (status -> CANCELLED)
+    - Assigned Helper: cancel accepted assignment (status -> PENDING, helper_id -> NULL)
     
     Returns:
         JSON: {
-            'message': str (role-specific message),
+            'message': str,
             'request': { ...updated_emergency_data... }
         }, 200
     """
@@ -277,33 +286,26 @@ def cancel_emergency_request(request_id):
     if not emergency:
         return jsonify({'error': 'Emergency request not found'}), 404
     
-    if user.role == UserRole.REQUESTER:
-        # Requester can only cancel their own requests
-        if emergency.requester_id != user.id:
-            return jsonify({'error': 'Forbidden: you can only cancel your own request'}), 403
-        
-        # Cannot cancel already completed or cancelled requests
+    if emergency.requester_id == user.id:
+        # Requester can cancel their own requests
         if emergency.status in (EmergencyStatus.COMPLETED, EmergencyStatus.CANCELLED):
             return jsonify({'error': 'Request cannot be cancelled in its current status'}), 400
         
         emergency.status = EmergencyStatus.CANCELLED
+        message = 'Emergency request cancelled successfully'
     
-    elif user.role == UserRole.HELPER:
-        # Helper can only cancel if request is assigned to them
-        if emergency.helper_id != user.id:
-            return jsonify({'error': 'Forbidden: request is not assigned to you'}), 403
-        
-        # Helper can only cancel accepted requests
+    elif emergency.helper_id == user.id:
+        # Helper can cancel accepted assignment
         if emergency.status != EmergencyStatus.ACCEPTED:
             return jsonify({'error': 'Only accepted requests can be cancelled by helper'}), 400
         
-        # Revert to pending for other helpers to accept
         emergency.status = EmergencyStatus.PENDING
         emergency.helper_id = None
         emergency.accepted_at = None
+        message = 'Assignment cancelled successfully. Request is pending for other helpers.'
     
     else:
-        return jsonify({'error': 'Unsupported user role'}), 403
+        return jsonify({'error': 'Forbidden: you are not a participant in this request'}), 403
     
     try:
         db.session.commit()
@@ -317,12 +319,6 @@ def cancel_emergency_request(request_id):
         'status': emergency.status.value,
         'helper_id': emergency.helper_id,
     })
-    
-    # Role-specific message
-    if user.role == UserRole.HELPER:
-        message = 'Assignment cancelled successfully. Request is pending for other helpers.'
-    else:
-        message = 'Emergency request cancelled successfully'
     
     return jsonify({
         'message': message,

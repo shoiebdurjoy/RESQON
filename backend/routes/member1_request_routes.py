@@ -73,7 +73,7 @@ def _send_sms(to_phone, body):
 
 
 def requester_required(fn):
-    """Decorator that requires JWT token and requester role."""
+    """Decorator that requires JWT token and valid active user."""
     @wraps(fn)
     @jwt_required()
     def wrapped(*args, **kwargs):
@@ -83,10 +83,8 @@ def requester_required(fn):
         if not user:
             return jsonify({'error': 'User not found'}), 404
         
-        if user.role != UserRole.REQUESTER:
-            return jsonify({'error': 'Forbidden: requester role required'}), 403
-        
         g.current_requester = user
+        g.current_user = user
         return fn(*args, **kwargs)
     
     return wrapped

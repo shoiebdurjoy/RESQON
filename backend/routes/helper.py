@@ -19,11 +19,7 @@ bp = Blueprint('helper', __name__, url_prefix='/helper')
 
 def helper_required(fn):
     """
-    Custom decorator to protect helper-only endpoints.
-
-    This decorator does two checks:
-    1. Ensures the JWT token is valid via @jwt_required().
-    2. Ensures the authenticated user has role == 'helper'.
+    Decorator that requires JWT token and active user.
     """
     @wraps(fn)
     @jwt_required()
@@ -38,12 +34,9 @@ def helper_required(fn):
         if not user:
             return jsonify({'error': 'User not found'}), 404
 
-        # Enforce helper-only access.
-        if user.role != UserRole.HELPER:
-            return jsonify({'error': 'Forbidden: helper role required'}), 403
-
-        # Store the helper object in flask.g to avoid repeated queries inside route handlers.
+        # Store the user object in flask.g.
         g.current_helper = user
+        g.current_user = user
 
         # Continue execution of the wrapped route function.
         return fn(*args, **kwargs)
