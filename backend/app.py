@@ -240,6 +240,7 @@ def create_app(config_name=None):
     
     # ---- Health Check Endpoint ----
     
+    @app.route('/health', methods=['GET'])
     @app.route('/api/health', methods=['GET'])
     def health_check():
         """
