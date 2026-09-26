@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: smart-emergency-db
+    environment:
+      POSTGRES_USER: smart_user
+      POSTGRES_PASSWORD: smart_password
+      POSTGRES_DB: smart_emergency
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U smart_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Flask Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: smart-emergency-backend
+    environment:
+      FLASK_ENV: development
+      DATABASE_URL: postgresql://smart_user:smart_password@postgres:5432/smart_emergency
+      JWT_SECRET_KEY: dev-secret-key-change-in-production
+      FRONTEND_URL: http://localhost:5173
+      GOOGLE_MAPS_API_KEY: ${GOOGLE_MAPS_API_KEY}
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN}
+      TWILIO_PHONE_NUMBER: ${TWILIO_PHONE_NUMBER}
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: python app.py
+
+  # React Frontend (Optional - for production builds)
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+  #   container_name: smart-emergency-frontend
+  #   ports:
+  #     - "5173:5173"
+  #   environment:
+  #     VITE_API_URL: http://localhost:5000
+  #     VITE_GOOGLE_MAPS_API_KEY: ${GOOGLE_MAPS_API_KEY}
+
+volumes:
+  postgres_data:
+
+networks:
+  default:
+    name: smart-emergency-network
