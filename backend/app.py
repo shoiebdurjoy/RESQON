@@ -249,12 +249,19 @@ def create_app(config_name=None):
         Returns:
             JSON response with service status and version information
         """
+        db_status = 'connected'
+        try:
+            from sqlalchemy import text
+            db.session.execute(text('SELECT 1'))
+        except Exception:
+            db_status = 'disconnected'
+
         return jsonify({
             'status': 'healthy',
             'service': 'RESQON Emergency Coordination API',
             'version': '1.0.0',
             'environment': config_name,
-            'database': 'connected' if db.engine.pool.size() > 0 else 'disconnected'
+            'database': db_status
         }), 200
     
     # ---- Debug Information Endpoint ----

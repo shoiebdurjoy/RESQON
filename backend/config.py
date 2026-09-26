@@ -21,23 +21,38 @@ class Config:
     
     # ---- DATABASE CONFIGURATION ----
     _db_url = os.getenv('DATABASE_URL', 'sqlite:///smart_emergency.db')
+    
     # Render supplies "postgres://" or "postgresql://" — specify psycopg2 driver explicitly
     if _db_url.startswith('postgres://'):
         _db_url = _db_url.replace('postgres://', 'postgresql+psycopg2://', 1)
     elif _db_url.startswith('postgresql://') and not _db_url.startswith('postgresql+'):
         _db_url = _db_url.replace('postgresql://', 'postgresql+psycopg2://', 1)
+
+    # Validate that PostgreSQL host is reachable via DNS (prevents crashes from old/invalid hostnames)
+    if 'postgresql' in _db_url and '@' in _db_url:
+        import socket
+        try:
+            _host = _db_url.split('@')[1].split('/')[0].split(':')[0]
+            socket.gethostbyname(_host)
+        except Exception:
+            # Host could not be resolved (e.g. from an old suspended Render account) -> fallback to SQLite
+            _db_url = 'sqlite:///smart_emergency.db'
+
     SQLALCHEMY_DATABASE_URI = _db_url
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    # PostgreSQL connection pool settings
-    _engine_options = {
-        'pool_pre_ping': True,      # verify connections before checkout
-        'pool_recycle': 300,         # recycle connections every 5 min
-        'pool_size': 5,
-        'max_overflow': 10,
-    }
+    # Connection pool settings (only apply to PostgreSQL, SQLite does not use pool_size)
     if 'postgresql' in _db_url:
-        _engine_options['connect_args'] = {'connect_timeout': 10}
+        _engine_options = {
+            'pool_pre_ping': True,
+            'pool_recycle': 300,
+            'pool_size': 5,
+            'max_overflow': 10,
+            'connect_args': {'connect_timeout': 10}
+        }
+    else:
+        _engine_options = {}
+
     SQLALCHEMY_ENGINE_OPTIONS = _engine_options
     
     # ---- JWT (JSON Web Token) CONFIGURATION ----
