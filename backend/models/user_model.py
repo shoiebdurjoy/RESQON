@@ -88,25 +88,20 @@ class User(db.Model):
     # ---- Methods ----
     
     def set_password(self, password):
-        """
-        Hash and set the user's password using bcrypt.
-        
-        Args:
-            password (str): Plain text password to hash
-        """
-        self.password_hash = generate_password_hash(password).decode('utf-8')
+        """Hash and set the user's password using bcrypt."""
+        h = generate_password_hash(password)
+        if isinstance(h, bytes):
+            h = h.decode('utf-8')
+        self.password_hash = str(h)
     
     def check_password(self, password):
-        """
-        Verify a plain text password against the stored hash.
-        
-        Args:
-            password (str): Plain text password to verify
-            
-        Returns:
-            bool: True if password matches, False otherwise
-        """
-        return check_password_hash(self.password_hash, password)
+        """Verify a plain text password against the stored hash."""
+        if not self.password_hash:
+            return False
+        try:
+            return check_password_hash(self.password_hash, password)
+        except Exception:
+            return False
     
     def to_dict(self):
         """

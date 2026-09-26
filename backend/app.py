@@ -229,13 +229,10 @@ def create_app(config_name=None):
             JSON response with error message and 500 status code
         """
         db.session.rollback()
-        
-        # Log the error for debugging
         app.logger.error(f'Internal Server Error: {error}')
-        
         return jsonify({
             'error': 'Internal Server Error',
-            'message': 'An unexpected error occurred. Our team has been notified.'
+            'details': str(getattr(error, 'original_exception', error))
         }), 500
     
     # ---- Health Check Endpoint ----

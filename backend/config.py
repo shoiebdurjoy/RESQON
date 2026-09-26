@@ -69,7 +69,7 @@ class Config:
     
     # ---- FLASK CONFIGURATION ----
     JSON_SORT_KEYS = False
-    PROPAGATE_EXCEPTIONS = True
+    PROPAGATE_EXCEPTIONS = False
     
     # ---- SOCKETIO CONFIGURATION ----
     # Use threading for local development on Python 3.14+; eventlet is not required.
