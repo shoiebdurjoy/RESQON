@@ -281,8 +281,21 @@ def create_app(config_name=None):
                 })
         return jsonify({'routes': routes}), 200
     
-    # ---- Database Initialization ----
-    
+    @app.route('/api/debug-db', methods=['GET'])
+    def debug_db():
+        """Debug database queries and return exact exception traceback if any."""
+        try:
+            from models import User
+            users = User.query.all()
+            return jsonify({'status': 'ok', 'user_count': len(users)}), 200
+        except Exception as e:
+            import traceback
+            return jsonify({
+                'status': 'error',
+                'error': str(e),
+                'traceback': traceback.format_exc()
+            }), 500
+
     @app.route('/api/db-init', methods=['GET', 'POST'])
     def db_init():
         """Ensure all database tables are created."""
