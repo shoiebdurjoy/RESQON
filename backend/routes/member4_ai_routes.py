@@ -51,7 +51,7 @@ def _get_openai_client():
 # ============================================================================
 
 @bp.route('/api/ai/summarize', methods=['POST'])
-@jwt_required()
+@jwt_required(optional=True)
 def ai_summarize():
     """
     Generate a concise AI summary of an emergency description and suggest
@@ -193,7 +193,7 @@ def ai_summarize():
 # ============================================================================
 
 @bp.route('/api/analytics/performance', methods=['GET'])
-@jwt_required()
+@jwt_required(optional=True)
 def performance_metrics():
     """
     Return system-wide performance metrics for helpers and request resolution.

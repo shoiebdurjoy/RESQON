@@ -193,7 +193,7 @@ def create_emergency_request():
 
 
 @bp.route('/all', methods=['GET'])
-@jwt_required()
+@jwt_required(optional=True)
 def get_all_emergency_requests():
     """
     GET /api/emergency/all

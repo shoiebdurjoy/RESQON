@@ -86,9 +86,8 @@ export default function AppNavbar() {
       .catch(() => {});
   }, [token]);
 
-  // Active units counter
+  // Active units counter (visible to all visitors)
   useEffect(() => {
-    if (!token) return;
     function fetchCount() {
       axios.get(`${API_URL}/helper/available`)
         .then(r => setOnlineCount(r.data?.helpers?.length ?? 0))
@@ -97,7 +96,7 @@ export default function AppNavbar() {
     fetchCount();
     socket.on('helper_availability_updated', fetchCount);
     return () => socket.off('helper_availability_updated', fetchCount);
-  }, [token]);
+  }, []);
 
   // Unread incident badge
   useEffect(() => {
@@ -314,33 +313,35 @@ export default function AppNavbar() {
             <span>Report Incident</span>
           </NavLink>
 
-          {/* Responder Duty Status Pill */}
-          <button
-            onClick={toggleAvailability}
-            disabled={toggling}
-            title={helperOnline ? 'Click to go off-duty' : 'Click to go on-duty (available for emergency dispatch)'}
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: '0.375rem',
-              padding: '0.3rem 0.65rem', borderRadius: 99,
-              fontSize: '0.75rem', fontWeight: 600, fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif",
-              border: helperOnline ? '1px solid #A8DCBC' : '1px solid #D0CEC4',
-              background: helperOnline ? '#EDF8F2' : '#F7F6F1',
-              color: helperOnline ? '#15663E' : '#5A5850',
-              cursor: toggling ? 'not-allowed' : 'pointer',
-              transition: 'all 0.18s ease',
-              flexShrink: 0,
-            }}
-          >
-            <span
+          {/* Responder Duty Status Pill — only shown for authenticated helpers */}
+          {token && isHelper && (
+            <button
+              onClick={toggleAvailability}
+              disabled={toggling}
+              title={helperOnline ? 'Click to go off-duty' : 'Click to go on-duty (available for emergency dispatch)'}
               style={{
-                width: 7, height: 7, borderRadius: '50%',
-                background: helperOnline ? '#1A7F4E' : '#8A8878',
-                display: 'inline-block',
-                boxShadow: helperOnline ? '0 0 0 2px rgba(26,127,78,0.2)' : 'none',
+                display: 'inline-flex', alignItems: 'center', gap: '0.375rem',
+                padding: '0.3rem 0.65rem', borderRadius: 99,
+                fontSize: '0.75rem', fontWeight: 600, fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif",
+                border: helperOnline ? '1px solid #A8DCBC' : '1px solid #D0CEC4',
+                background: helperOnline ? '#EDF8F2' : '#F7F6F1',
+                color: helperOnline ? '#15663E' : '#5A5850',
+                cursor: toggling ? 'not-allowed' : 'pointer',
+                transition: 'all 0.18s ease',
+                flexShrink: 0,
               }}
-            />
-            {toggling ? 'Updating…' : helperOnline ? 'On Duty' : 'Off Duty'}
-          </button>
+            >
+              <span
+                style={{
+                  width: 7, height: 7, borderRadius: '50%',
+                  background: helperOnline ? '#1A7F4E' : '#8A8878',
+                  display: 'inline-block',
+                  boxShadow: helperOnline ? '0 0 0 2px rgba(26,127,78,0.2)' : 'none',
+                }}
+              />
+              {toggling ? 'Updating…' : helperOnline ? 'On Duty' : 'Off Duty'}
+            </button>
+          )}
 
           {/* Active Field Responders Counter */}
           <div
@@ -360,8 +361,43 @@ export default function AppNavbar() {
             {onlineCount} Active
           </div>
 
-          {/* Consolidated Profile Dropdown */}
-          <div ref={profileRef} style={{ position: 'relative' }} className="hidden sm:block">
+          {/* User Profile or Guest Auth Buttons */}
+          {!token ? (
+            <div className="hidden sm:flex" style={{ alignItems: 'center', gap: '0.45rem' }}>
+              <NavLink
+                to="/login"
+                style={{
+                  padding: '0.32rem 0.8rem', borderRadius: 99,
+                  fontSize: '0.8125rem', fontWeight: 600,
+                  color: '#0D0C0A', background: '#FFFFFF',
+                  border: '1.5px solid #D0CEC4', textDecoration: 'none',
+                  transition: 'all 0.15s ease',
+                  fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif",
+                }}
+                onMouseEnter={e => e.currentTarget.style.borderColor = '#0D0C0A'}
+                onMouseLeave={e => e.currentTarget.style.borderColor = '#D0CEC4'}
+              >
+                Sign In
+              </NavLink>
+              <NavLink
+                to="/register"
+                style={{
+                  padding: '0.32rem 0.9rem', borderRadius: 99,
+                  fontSize: '0.8125rem', fontWeight: 700,
+                  color: '#FFFFFF', background: '#0D0C0A',
+                  textDecoration: 'none', transition: 'all 0.15s ease',
+                  boxShadow: '0 2px 8px rgba(13,12,10,0.18)',
+                  fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif",
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = '#2E2D2A'}
+                onMouseLeave={e => e.currentTarget.style.background = '#0D0C0A'}
+              >
+                Join Network
+              </NavLink>
+            </div>
+          ) : (
+            /* Consolidated Profile Dropdown */
+            <div ref={profileRef} style={{ position: 'relative' }} className="hidden sm:block">
             <button
               onClick={() => setProfileOpen(o => !o)}
               style={{
@@ -463,6 +499,7 @@ export default function AppNavbar() {
               </div>
             )}
           </div>
+          )}
 
           {/* Mobile Menu Toggle Button */}
           <button
@@ -483,15 +520,46 @@ export default function AppNavbar() {
       {mobileOpen && (
         <div style={{ background: '#FFFFFF', borderTop: '1px solid #E4E2DA', padding: '0.75rem 1.25rem 1.25rem' }}>
 
-          {/* Mobile Duty Status Toggle */}
-          <div style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            padding: '0.625rem 0.875rem', marginBottom: '0.75rem',
-            border: `1px solid ${helperOnline ? '#A8DCBC' : '#E4E2DA'}`,
-            borderRadius: 8, background: helperOnline ? '#EDF8F2' : '#F7F6F1',
-          }}>
-            <div>
-              <p style={{ fontSize: '0.8125rem', fontWeight: 700, color: helperOnline ? '#15663E' : '#2E2D2A', lineHeight: 1.2 }}>
+          {/* Guest Action Buttons if not logged in */}
+          {!token ? (
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginBottom: '1rem', paddingBottom: '0.75rem', borderBottom: '1px solid #F0EFE9' }}>
+              <NavLink
+                to="/login"
+                onClick={() => setMobileOpen(false)}
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  padding: '0.6rem', borderRadius: 8,
+                  fontSize: '0.8125rem', fontWeight: 600,
+                  color: '#0D0C0A', background: '#F7F6F1',
+                  border: '1px solid #D0CEC4', textDecoration: 'none',
+                }}
+              >
+                Sign In
+              </NavLink>
+              <NavLink
+                to="/register"
+                onClick={() => setMobileOpen(false)}
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  padding: '0.6rem', borderRadius: 8,
+                  fontSize: '0.8125rem', fontWeight: 700,
+                  color: '#FFFFFF', background: '#0D0C0A',
+                  textDecoration: 'none',
+                }}
+              >
+                Join Network →
+              </NavLink>
+            </div>
+          ) : token && isHelper ? (
+            /* Mobile Duty Status Toggle */
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: '0.625rem 0.875rem', marginBottom: '0.75rem',
+              border: `1px solid ${helperOnline ? '#A8DCBC' : '#E4E2DA'}`,
+              borderRadius: 8, background: helperOnline ? '#EDF8F2' : '#F7F6F1',
+            }}>
+              <div>
+                <p style={{ fontSize: '0.8125rem', fontWeight: 700, color: helperOnline ? '#15663E' : '#2E2D2A', lineHeight: 1.2 }}>
                 {helperOnline ? '🟢 On Duty — Ready for Dispatch' : '⚪ Off Duty'}
               </p>
               <p style={{ fontSize: '0.6875rem', color: '#8A8878', marginTop: 2 }}>
@@ -520,6 +588,7 @@ export default function AppNavbar() {
               }} />
             </button>
           </div>
+          ) : null}
 
           {/* Navigation Links */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
@@ -537,22 +606,24 @@ export default function AppNavbar() {
               <Activity size={16} /> Operations Console
             </NavLink>
 
-            <NavLink
-              to="/notification/history"
-              onClick={() => setMobileOpen(false)}
-              style={({ isActive }) => ({
-                display: 'flex', alignItems: 'center', gap: '0.625rem',
-                padding: '0.6rem 0.75rem', borderRadius: 6, textDecoration: 'none',
-                fontSize: '0.875rem', fontWeight: 600,
-                color: isActive ? '#D93B2B' : '#2E2D2A',
-                background: isActive ? '#FEF3F1' : 'transparent',
-              })}
-            >
-              <Bell size={16} /> Incident History
-              {hasUnread && (
-                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#D93B2B', display: 'inline-block', marginLeft: 4 }} />
-              )}
-            </NavLink>
+            {token && (
+              <NavLink
+                to="/notification/history"
+                onClick={() => setMobileOpen(false)}
+                style={({ isActive }) => ({
+                  display: 'flex', alignItems: 'center', gap: '0.625rem',
+                  padding: '0.6rem 0.75rem', borderRadius: 6, textDecoration: 'none',
+                  fontSize: '0.875rem', fontWeight: 600,
+                  color: isActive ? '#D93B2B' : '#2E2D2A',
+                  background: isActive ? '#FEF3F1' : 'transparent',
+                })}
+              >
+                <Bell size={16} /> Incident History
+                {hasUnread && (
+                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#D93B2B', display: 'inline-block', marginLeft: 4 }} />
+                )}
+              </NavLink>
+            )}
 
             {/* Sub-group: Tactical Intelligence */}
             <div style={{ marginTop: '0.4rem', paddingTop: '0.4rem', borderTop: '1px solid #F0EFE9' }}>
@@ -591,39 +662,43 @@ export default function AppNavbar() {
               <Bot size={16} /> AI Emergency Assistant
             </NavLink>
 
-            <button
-              onClick={() => { setMobileOpen(false); setProfileModalOpen(true); }}
-              style={{
-                display: 'flex', alignItems: 'center', gap: '0.625rem',
-                padding: '0.6rem 0.75rem', borderRadius: 6,
-                fontSize: '0.875rem', fontWeight: 600,
-                color: '#2E2D2A', background: 'transparent', border: 'none',
-                cursor: 'pointer', width: '100%', textAlign: 'left',
-                fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif",
-              }}
-            >
-              <User size={16} /> Responder Qualifications & Profile
-            </button>
+            {token && (
+              <button
+                onClick={() => { setMobileOpen(false); setProfileModalOpen(true); }}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '0.625rem',
+                  padding: '0.6rem 0.75rem', borderRadius: 6,
+                  fontSize: '0.875rem', fontWeight: 600,
+                  color: '#2E2D2A', background: 'transparent', border: 'none',
+                  cursor: 'pointer', width: '100%', textAlign: 'left',
+                  fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif",
+                }}
+              >
+                <User size={16} /> Responder Qualifications & Profile
+              </button>
+            )}
           </div>
 
           {/* User Signout Footer */}
-          <div style={{ borderTop: '1px solid #E4E2DA', marginTop: '0.75rem', paddingTop: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div>
-              <p style={{ fontSize: '0.8125rem', fontWeight: 600, color: '#0D0C0A' }}>{user?.name || user?.email}</p>
-              <p style={{ fontSize: '0.6875rem', color: '#8A8878' }}>{user?.email}</p>
+          {token && (
+            <div style={{ borderTop: '1px solid #E4E2DA', marginTop: '0.75rem', paddingTop: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div>
+                <p style={{ fontSize: '0.8125rem', fontWeight: 600, color: '#0D0C0A' }}>{user?.name || user?.email}</p>
+                <p style={{ fontSize: '0.6875rem', color: '#8A8878' }}>{user?.email}</p>
+              </div>
+              <button
+                onClick={handleLogout}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '0.35rem',
+                  padding: '0.35rem 0.75rem', fontSize: '0.75rem', fontWeight: 700,
+                  color: '#B02E20', background: '#FEF3F1', border: '1px solid #F5C4BE',
+                  borderRadius: 6, cursor: 'pointer', fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif",
+                }}
+              >
+                <LogOut size={12} /> Sign out
+              </button>
             </div>
-            <button
-              onClick={handleLogout}
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: '0.35rem',
-                padding: '0.35rem 0.75rem', fontSize: '0.75rem', fontWeight: 700,
-                color: '#B02E20', background: '#FEF3F1', border: '1px solid #F5C4BE',
-                borderRadius: 6, cursor: 'pointer', fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif",
-              }}
-            >
-              <LogOut size={12} /> Sign out
-            </button>
-          </div>
+          )}
         </div>
       )}
 

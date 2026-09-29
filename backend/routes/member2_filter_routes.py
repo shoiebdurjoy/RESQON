@@ -51,7 +51,7 @@ def _parse_enum(enum_cls, raw_value):
 # ============================================================================
 
 @bp.route('/api/emergency/all', methods=['GET'])
-@jwt_required()
+@jwt_required(optional=True)
 def get_all_emergency_requests():
     """
     Return all emergency requests with optional filtering.

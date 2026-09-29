@@ -88,7 +88,7 @@ def _compute_risk(req, available_helpers_count):
 # ============================================================================
 
 @bp.route('/api/emergency/risk-flags', methods=['GET'])
-@jwt_required()
+@jwt_required(optional=True)
 def get_risk_flagged():
     """
     Return all PENDING emergency requests flagged as high-risk.
@@ -191,7 +191,7 @@ def get_risk_flagged():
 # ============================================================================
 
 @bp.route('/api/emergency/sorted', methods=['GET'])
-@jwt_required()
+@jwt_required(optional=True)
 def get_sorted_requests():
     """
     Return all PENDING emergency requests sorted by composite risk score

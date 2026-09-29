@@ -30,7 +30,7 @@ bp = Blueprint('member3_timeline', __name__)
 # ============================================================================
 
 @bp.route('/api/emergency/<int:request_id>/timeline', methods=['GET'])
-@jwt_required()
+@jwt_required(optional=True)
 def get_request_timeline(request_id):
     """
     Return the full status timeline for a single emergency request.
@@ -142,7 +142,7 @@ def get_request_timeline(request_id):
 # ============================================================================
 
 @bp.route('/api/analytics/trends', methods=['GET'])
-@jwt_required()
+@jwt_required(optional=True)
 def get_emergency_trends():
     """
     Return a breakdown of emergency request counts grouped by type and day

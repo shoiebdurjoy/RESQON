@@ -287,11 +287,16 @@ export default function Dashboard() {
     if (statusFilter) params.set('status', statusFilter);
     if (typeFilter)   params.set('type', typeFilter);
     if (dateFilter)   params.set('date', dateFilter);
-    const res = await axios.get(`${API_URL}/emergency/all?${params}`, { headers: authHeaders });
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+    const res = await axios.get(`${API_URL}/emergency/all?${params}`, { headers });
     setCommunityRequests(res.data.requests || []);
   }
 
   async function fetchMyRequests() {
+    if (!token) {
+      setMyRequests([]);
+      return;
+    }
     const res = await axios.get(`${API_URL}/emergency/my`, { headers: authHeaders });
     setMyRequests(res.data.requests || []);
   }
@@ -299,24 +304,27 @@ export default function Dashboard() {
   async function bootstrapData() {
     setIsLoading(true);
     try {
-      await Promise.all([fetchCommunityRequests(), fetchMyRequests()]);
+      if (token) {
+        await Promise.all([fetchCommunityRequests(), fetchMyRequests()]);
+      } else {
+        await fetchCommunityRequests();
+      }
+    } catch (e) {
+      console.error('Failed to load emergency data:', e);
     } finally {
       setIsLoading(false);
     }
   }
 
   useEffect(() => {
-    if (!token || !user) return;
     bootstrapData();
-  }, [token, user, statusFilter, typeFilter, dateFilter]);
+  }, [token, statusFilter, typeFilter, dateFilter]);
 
   // Real-time socket listeners
   useEffect(() => {
-    if (!token || !user) return;
-
     const onUpdate = () => {
       fetchCommunityRequests();
-      fetchMyRequests();
+      if (token) fetchMyRequests();
     };
 
     const onNew = (payload) => {
@@ -340,7 +348,7 @@ export default function Dashboard() {
       socket.off('request_status_updated', onUpdate);
       socket.off('new_emergency_request', onNew);
     };
-  }, [token, user, statusFilter, typeFilter, dateFilter]);
+  }, [token, statusFilter, typeFilter, dateFilter]);
 
   async function doAction(key, fn) {
     setActionLoading(p => ({ ...p, [key]: true }));
@@ -353,11 +361,18 @@ export default function Dashboard() {
     }
   }
 
-  const handleAccept = (id) => doAction(`accept-${id}`, async () => {
-    await axios.put(`${API_URL}/emergency/${id}/accept`, {}, { headers: authHeaders });
-    toast.success('Unit mobilized. Incident status updated to active response.');
-    await Promise.all([fetchCommunityRequests(), fetchMyRequests()]);
-  });
+  const handleAccept = (id) => {
+    if (!token) {
+      toast('Please sign in as a certified responder to mobilize for this incident.', { icon: '🔒' });
+      navigate('/login', { state: { from: `/emergency/${id}` } });
+      return;
+    }
+    doAction(`accept-${id}`, async () => {
+      await axios.put(`${API_URL}/emergency/${id}/accept`, {}, { headers: authHeaders });
+      toast.success('Unit mobilized. Incident status updated to active response.');
+      await Promise.all([fetchCommunityRequests(), fetchMyRequests()]);
+    });
+  };
 
   const handleReject = (id) => doAction(`reject-${id}`, async () => {
     await axios.put(`${API_URL}/emergency/${id}/reject`, {}, { headers: authHeaders });
@@ -440,6 +455,70 @@ export default function Dashboard() {
   return (
     <div className="page-enter" style={{ maxWidth: 1280, margin: '0 auto', padding: '2rem 1.5rem' }}>
 
+      {/* Guest Preview Mode Banner */}
+      {!token && (
+        <div style={{
+          background: '#FFFFFF',
+          border: '1px solid #E4E2DA',
+          borderRadius: 12,
+          padding: '1.125rem 1.5rem',
+          marginBottom: '1.75rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '1rem',
+          flexWrap: 'wrap',
+          boxShadow: '0 4px 20px -4px rgba(0,0,0,0.06)',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', maxWidth: 680 }}>
+            <div style={{
+              width: 40, height: 40, borderRadius: 10,
+              background: '#0D0C0A', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexShrink: 0,
+            }}>
+              <Zap size={20} color="#D93B2B" strokeWidth={2.5} />
+            </div>
+            <div>
+              <p style={{ fontWeight: 800, fontSize: '0.9375rem', color: '#0D0C0A', margin: 0, letterSpacing: '-0.02em' }}>
+                Live Emergency Operations Feed • Explore Mode
+              </p>
+              <p style={{ fontSize: '0.8125rem', color: '#5A5850', margin: '0.2rem 0 0 0', lineHeight: 1.5 }}>
+                You are previewing live crisis dispatches and telemetry. When you are ready to report an incident or mobilize as a certified responder, sign in to activate your operator console.
+              </p>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
+            <Link
+              to="/login"
+              state={{ from: '/dashboard' }}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: '0.35rem',
+                padding: '0.5rem 1rem', borderRadius: 8,
+                fontSize: '0.8125rem', fontWeight: 700,
+                background: '#0D0C0A', color: '#FFFFFF',
+                textDecoration: 'none',
+                boxShadow: '0 2px 8px rgba(13,12,10,0.18)',
+              }}
+            >
+              Sign In to Console →
+            </Link>
+            <Link
+              to="/register"
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: '0.35rem',
+                padding: '0.5rem 1rem', borderRadius: 8,
+                fontSize: '0.8125rem', fontWeight: 600,
+                background: '#F7F6F1', color: '#2E2D2A',
+                border: '1px solid #D0CEC4', textDecoration: 'none',
+              }}
+            >
+              Join Network
+            </Link>
+          </div>
+        </div>
+      )}
+
       {/* Page header with direct emergency create button */}
       <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', marginBottom: '1.75rem' }}>
         <div>
@@ -456,13 +535,20 @@ export default function Dashboard() {
           </h1>
         </div>
 
-        <Link
-          to="/emergency/create"
+        <button
+          onClick={() => {
+            if (!token) {
+              toast('Please sign in to report an emergency incident.', { icon: '🔒' });
+              navigate('/login', { state: { from: '/emergency/create' } });
+            } else {
+              navigate('/emergency/create');
+            }
+          }}
           className="btn-primary"
-          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.6rem 1.25rem', fontSize: '0.875rem', textDecoration: 'none', boxShadow: '0 2px 8px rgba(217,59,43,0.25)' }}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.6rem 1.25rem', fontSize: '0.875rem', border: 'none', cursor: 'pointer', boxShadow: '0 2px 8px rgba(217,59,43,0.25)' }}
         >
           <Plus size={16} strokeWidth={2.5} /> Report Incident
-        </Link>
+        </button>
       </div>
 
       {/* Critical High-Urgency Alert Banner */}
@@ -511,7 +597,15 @@ export default function Dashboard() {
           Active Incident Queue ({communityRequests.length})
         </button>
         <button
-          onClick={() => { setActiveTab('mine'); setSearchParams({ tab: 'mine' }); }}
+          onClick={() => {
+            if (!token) {
+              toast('Sign in to view your personal field assignments and reported incidents.', { icon: '🔒' });
+              navigate('/login', { state: { from: '/dashboard?tab=mine' } });
+              return;
+            }
+            setActiveTab('mine');
+            setSearchParams({ tab: 'mine' });
+          }}
           style={{
             background: activeTab === 'mine' ? '#FEF3F1' : 'transparent',
             color: activeTab === 'mine' ? '#D93B2B' : '#5A5850',

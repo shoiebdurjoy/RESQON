@@ -41,7 +41,7 @@ def _seconds_to_minutes(seconds):
 # ============================================================================
 
 @bp.route('/api/dashboard/stats', methods=['GET'])
-@jwt_required()
+@jwt_required(optional=True)
 def dashboard_stats():
     """
     Return global system statistics for the interactive dashboard.
@@ -132,7 +132,7 @@ def dashboard_stats():
 # ============================================================================
 
 @bp.route('/api/analytics/summary', methods=['GET'])
-@jwt_required()
+@jwt_required(optional=True)
 def analytics_summary():
     """
     Return system-wide analytics summary.

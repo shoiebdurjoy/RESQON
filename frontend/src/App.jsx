@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Toaster } from 'react-hot-toast';
 
@@ -28,15 +28,27 @@ function LoadingScreen() {
   );
 }
 
+// App shell layout with universal navigation bar (accessible in preview and auth mode)
+function AppLayout({ children }) {
+  return (
+    <div style={{ minHeight: '100vh', background: '#F0EFE9', color: '#0D0C0A', fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif" }}>
+      <AppNavbar />
+      {children}
+    </div>
+  );
+}
+
+// Enforces authentication on sensitive operational routes (e.g. creating emergency requests)
 function PrivateRoute({ role = 'any', children }) {
   const { isAuthenticated, isLoading, isHelper, isRequester } = useAuth();
+  const location = useLocation();
 
   if (isLoading) {
     return <LoadingScreen />;
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
 
   if (role === 'helper' && !isHelper) {
@@ -48,43 +60,34 @@ function PrivateRoute({ role = 'any', children }) {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#F0EFE9', color: '#0D0C0A', fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif" }}>
-      <AppNavbar />
+    <AppLayout>
       {children}
-    </div>
+    </AppLayout>
   );
 }
 
 function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/login" replace />} />
+      {/* Publicly accessible exploration routes (visitors can view live emergencies and tools) */}
+      <Route path="/" element={<AppLayout><Dashboard /></AppLayout>} />
+      <Route path="/dashboard" element={<AppLayout><Dashboard /></AppLayout>} />
+      <Route path="/analytics" element={<AppLayout><AnalyticsDashboard /></AppLayout>} />
+      <Route path="/risk" element={<AppLayout><RiskFlagged /></AppLayout>} />
+      <Route path="/trends" element={<AppLayout><TrendsDashboard /></AppLayout>} />
+      <Route path="/ai" element={<AppLayout><AIAssistant /></AppLayout>} />
+      <Route path="/emergency/:id" element={<AppLayout><RequestDetails /></AppLayout>} />
+
+      {/* World-class Authentication routes */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
-      <Route
-        path="/dashboard"
-        element={
-          <PrivateRoute role="any">
-            <Dashboard />
-          </PrivateRoute>
-        }
-      />
-
+      {/* Protected operator-only actions */}
       <Route
         path="/emergency/create"
         element={
           <PrivateRoute role="any">
             <CreateEmergency />
-          </PrivateRoute>
-        }
-      />
-
-      <Route
-        path="/emergency/:id"
-        element={
-          <PrivateRoute role="any">
-            <RequestDetails />
           </PrivateRoute>
         }
       />
@@ -98,44 +101,8 @@ function AppRoutes() {
         }
       />
 
-      {/* Module 3 Routes */}
-      <Route
-        path="/analytics"
-        element={
-          <PrivateRoute role="any">
-            <AnalyticsDashboard />
-          </PrivateRoute>
-        }
-      />
-
-      <Route
-        path="/risk"
-        element={
-          <PrivateRoute role="any">
-            <RiskFlagged />
-          </PrivateRoute>
-        }
-      />
-
-      <Route
-        path="/trends"
-        element={
-          <PrivateRoute role="any">
-            <TrendsDashboard />
-          </PrivateRoute>
-        }
-      />
-
-      <Route
-        path="/ai"
-        element={
-          <PrivateRoute role="any">
-            <AIAssistant />
-          </PrivateRoute>
-        }
-      />
-
-      <Route path="*" element={<Navigate to="/login" replace />} />
+      {/* Catch-all fallback */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
