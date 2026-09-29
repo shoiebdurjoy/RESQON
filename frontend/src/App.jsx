@@ -18,10 +18,10 @@ import AIAssistant from './pages/AIAssistant';
 
 function LoadingScreen() {
   return (
-    <div style={{ minHeight: '100vh', background: '#F0EFE9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div className="scale-in" style={{ background: '#FFFFFF', border: '1px solid #E4E2DA', borderRadius: 12, padding: '1.75rem 2.5rem', boxShadow: '0 4px 24px rgba(0,0,0,0.08)', textAlign: 'center' }}>
-        <div style={{ width: 32, height: 32, borderRadius: '50%', border: '3px solid #E4E2DA', borderTopColor: '#D93B2B', animation: 'spin 0.7s linear infinite', margin: '0 auto 1rem' }} />
-        <p style={{ fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif", fontSize: '0.8125rem', fontWeight: 600, color: '#8A8878', letterSpacing: '0.04em' }}>Loading…</p>
+    <div style={{ minHeight: '100vh', background: '#F8FAFC', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div className="scale-in" style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: 16, padding: '2rem 2.75rem', boxShadow: '0 10px 25px -5px rgba(15,23,42,0.08)', textAlign: 'center' }}>
+        <div style={{ width: 32, height: 32, borderRadius: '50%', border: '3px solid #E2E8F0', borderTopColor: '#EF4444', animation: 'spin 0.7s linear infinite', margin: '0 auto 1rem' }} />
+        <p style={{ fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif", fontSize: '0.8125rem', fontWeight: 600, color: '#64748B', letterSpacing: '0.04em' }}>Loading RESQON Operations…</p>
       </div>
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
@@ -31,7 +31,7 @@ function LoadingScreen() {
 // App shell layout with universal navigation bar (accessible in preview and auth mode)
 function AppLayout({ children }) {
   return (
-    <div style={{ minHeight: '100vh', background: '#F0EFE9', color: '#0D0C0A', fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif" }}>
+    <div style={{ minHeight: '100vh', background: '#F8FAFC', color: '#0F172A', fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif" }}>
       <AppNavbar />
       {children}
     </div>

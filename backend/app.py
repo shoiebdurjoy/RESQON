@@ -314,26 +314,207 @@ def create_app(config_name=None):
             app.logger.error(f'db_init endpoint failed: {e}')
             return jsonify({'status': 'error', 'details': str(e)}), 500
 
+    @app.route('/api/seed-demo', methods=['GET', 'POST'])
+    def seed_demo_endpoint():
+        """Public endpoint to seed realistic demo data for testing and public exploration."""
+        try:
+            from flask import request
+            force = request.args.get('force', 'false').lower() == 'true'
+            res = seed_demo_data(force=force)
+            return jsonify({
+                'status': 'success',
+                'details': res,
+                'total_requests': EmergencyRequest.query.count(),
+                'total_users': User.query.count()
+            }), 200
+        except Exception as e:
+            app.logger.error(f'seed-demo endpoint failed: {e}')
+            return jsonify({'status': 'error', 'details': str(e)}), 500
+
+    def seed_demo_data(force=False):
+        """Seed realistic emergency and helper data so the dashboard is immediately vibrant."""
+        from models import User, UserRole, EmergencyRequest, EmergencyType, UrgencyLevel, EmergencyStatus
+        from datetime import datetime, timedelta
+        
+        if not force and EmergencyRequest.query.count() > 0:
+            return {'seeded': False, 'message': 'Data already present', 'count': EmergencyRequest.query.count()}
+        
+        if force:
+            EmergencyRequest.query.delete()
+            db.session.commit()
+
+        # Ensure demo users exist
+        def get_or_create_user(email, name, role, phone, blood_group=None, skills=None, is_available=True):
+            u = User.query.filter_by(email=email).first()
+            if not u:
+                u = User(
+                    name=name,
+                    email=email,
+                    role=role,
+                    phone=phone,
+                    blood_group=blood_group,
+                    skills=skills,
+                    is_available=is_available,
+                )
+                u.set_password('Password123!')
+                db.session.add(u)
+                db.session.flush()
+            return u
+
+        req1 = get_or_create_user(
+            'shoieb@resqon.org', 'Shoieb Durjoy', UserRole.REQUESTER,
+            '+8801712345678', blood_group='O-'
+        )
+        req2 = get_or_create_user(
+            'nusrat@resqon.org', 'Nusrat Jahan', UserRole.REQUESTER,
+            '+8801812345678', blood_group='A+'
+        )
+        help1 = get_or_create_user(
+            'sarah.khan@resqon.org', 'Dr. Sarah Khan', UserRole.HELPER,
+            '+8801912345678', blood_group='B+',
+            skills='ICU Triage, ACLS Certified, Blood Bank Specialist',
+            is_available=True
+        )
+        help2 = get_or_create_user(
+            'tariq@resqon.org', 'Tariq Ahmed', UserRole.HELPER,
+            '+8801612345678', blood_group='O+',
+            skills='Rapid Trauma Transport, Oxygen Specialist, First Aid Trainer',
+            is_available=True
+        )
+        help3 = get_or_create_user(
+            'helper@resqon.org', 'Kamrul Hasan', UserRole.HELPER,
+            '+8801512345678', blood_group='AB+',
+            skills='Emergency Driver, Disaster Relief',
+            is_available=True
+        )
+
+        now = datetime.utcnow()
+
+        demos = [
+            {
+                'requester_id': req1.id,
+                'helper_id': None,
+                'emergency_type': EmergencyType.BLOOD,
+                'urgency_level': UrgencyLevel.HIGH,
+                'status': EmergencyStatus.PENDING,
+                'description': 'CRITICAL: 2 units of O-Negative whole blood required immediately for emergency obstetric surgery at Dhaka Medical College Hospital, Ward 4.',
+                'latitude': 23.7258,
+                'longitude': 90.3976,
+                'created_at': now - timedelta(minutes=25),
+                'accepted_at': None,
+                'completed_at': None,
+            },
+            {
+                'requester_id': req2.id,
+                'helper_id': help2.id,
+                'emergency_type': EmergencyType.AMBULANCE,
+                'urgency_level': UrgencyLevel.HIGH,
+                'status': EmergencyStatus.ACCEPTED,
+                'description': '62yo patient experiencing acute myocardial infarction symptoms (severe chest pain, diaphoresis). Advanced cardiac life support ambulance en route with defibrillator.',
+                'latitude': 23.7925,
+                'longitude': 90.4078,
+                'created_at': now - timedelta(minutes=50),
+                'accepted_at': now - timedelta(minutes=38),
+                'completed_at': None,
+            },
+            {
+                'requester_id': req1.id,
+                'helper_id': None,
+                'emergency_type': EmergencyType.OXYGEN,
+                'urgency_level': UrgencyLevel.HIGH,
+                'status': EmergencyStatus.PENDING,
+                'description': 'Elderly COPD patient with SpO2 dropping to 84%. Urgent 10L/min high-flow oxygen cylinder or concentrator required in Dhanmondi Road 27.',
+                'latitude': 23.7533,
+                'longitude': 90.3769,
+                'created_at': now - timedelta(hours=1, minutes=15),
+                'accepted_at': None,
+                'completed_at': None,
+            },
+            {
+                'requester_id': req2.id,
+                'helper_id': help1.id,
+                'emergency_type': EmergencyType.BLOOD,
+                'urgency_level': UrgencyLevel.MEDIUM,
+                'status': EmergencyStatus.ACCEPTED,
+                'description': 'Dengue shock syndrome pediatric patient requiring urgent single donor platelets (SDP) A+ blood at Evercare Hospital.',
+                'latitude': 23.8103,
+                'longitude': 90.4312,
+                'created_at': now - timedelta(hours=2, minutes=30),
+                'accepted_at': now - timedelta(hours=2),
+                'completed_at': None,
+            },
+            {
+                'requester_id': req1.id,
+                'helper_id': help2.id,
+                'emergency_type': EmergencyType.AMBULANCE,
+                'urgency_level': UrgencyLevel.HIGH,
+                'status': EmergencyStatus.COMPLETED,
+                'description': 'Two passengers injured on Airport Road with severe orthopedic trauma. Paramedic transit to Kurmitola General Hospital completed successfully.',
+                'latitude': 23.8294,
+                'longitude': 90.4124,
+                'created_at': now - timedelta(hours=6),
+                'accepted_at': now - timedelta(hours=5, minutes=30),
+                'completed_at': now - timedelta(hours=4),
+            },
+            {
+                'requester_id': req2.id,
+                'helper_id': help1.id,
+                'emergency_type': EmergencyType.OXYGEN,
+                'urgency_level': UrgencyLevel.LOW,
+                'status': EmergencyStatus.COMPLETED,
+                'description': 'Post-operative pulmonary recovery oxygen tank delivered and setup at patient residence in Uttara Sector 4.',
+                'latitude': 23.8759,
+                'longitude': 90.3795,
+                'created_at': now - timedelta(days=1, hours=2),
+                'accepted_at': now - timedelta(days=1, hours=1),
+                'completed_at': now - timedelta(days=1),
+            },
+            {
+                'requester_id': req1.id,
+                'helper_id': help3.id,
+                'emergency_type': EmergencyType.BLOOD,
+                'urgency_level': UrgencyLevel.MEDIUM,
+                'status': EmergencyStatus.COMPLETED,
+                'description': 'Scheduled blood transfusion support coordinated for child with thalassemia at Bangladesh Thalassemia Samity Hospital.',
+                'latitude': 23.7461,
+                'longitude': 90.3742,
+                'created_at': now - timedelta(days=2, hours=3),
+                'accepted_at': now - timedelta(days=2, hours=2),
+                'completed_at': now - timedelta(days=2),
+            },
+        ]
+
+        for d in demos:
+            er = EmergencyRequest(**d)
+            db.session.add(er)
+
+        db.session.commit()
+        return {'seeded': True, 'count': len(demos)}
+
     _db_initialized = False
 
     @app.before_request
     def ensure_tables():
-        """Ensure database tables exist before processing requests"""
+        """Ensure database tables exist and demo data is seeded before processing requests"""
         nonlocal _db_initialized
         if not _db_initialized:
             try:
                 from models import User, EmergencyRequest, Message
                 db.create_all()
+                if EmergencyRequest.query.first() is None:
+                    seed_demo_data()
                 _db_initialized = True
             except Exception as e:
                 app.logger.warning(f'Lazy table initialization warning: {e}')
     
-    # Create all database tables (graceful error handling if DB is temporarily unreachable)
+    # Create all database tables and seed if empty
     with app.app_context():
         try:
             from models import User, EmergencyRequest, Message
             db.create_all()
-            app.logger.info(f'Database initialized for {config_name} environment')
+            if EmergencyRequest.query.first() is None:
+                seed_demo_data()
+            app.logger.info(f'Database initialized and seeded for {config_name} environment')
         except Exception as e:
             app.logger.error(f'Database initialization failed (verify DATABASE_URL): {e}')
     

@@ -2,40 +2,40 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ─── Design Tokens — Corporate Light Theme ─────────────────────────────── */
+/* ─── Design Tokens — High-Tech Modern SaaS Theme ─────────────────────── */
 :root {
-  --c-base:         #F0EFE9;
+  --c-base:         #F8FAFC;
   --c-surface:      #FFFFFF;
-  --c-recessed:     #F7F6F1;
-  --c-border:       #E4E2DA;
-  --c-border-strong:#D0CEC4;
+  --c-recessed:     #F1F5F9;
+  --c-border:       #E2E8F0;
+  --c-border-strong:#CBD5E1;
 
-  --c-ink:          #0D0C0A;
-  --c-ink-2:        #2E2D2A;
-  --c-ink-3:        #5A5850;
-  --c-ink-4:        #8A8878;
+  --c-ink:          #0F172A;
+  --c-ink-2:        #334155;
+  --c-ink-3:        #64748B;
+  --c-ink-4:        #94A3B8;
 
-  --c-red:          #D93B2B;
-  --c-red-dim:      #FEF3F1;
-  --c-red-border:   #F5C4BE;
-  --c-red-text:     #B02E20;
-  --c-red-dark:     #B02E20;
-  --c-green:        #1A7F4E;
-  --c-green-dim:    #EDF8F2;
-  --c-green-border: #A8DCBC;
-  --c-green-text:   #15663E;
-  --c-amber:        #C4780A;
-  --c-amber-dim:    #FDF6E8;
-  --c-amber-border: #E8D090;
-  --c-amber-text:   #9A5E08;
-  --c-blue:         #1854B4;
-  --c-blue-dim:     #EBF2FC;
-  --c-blue-border:  #B4CFF0;
-  --c-blue-text:    #1248A0;
+  --c-red:          #EF4444;
+  --c-red-dim:      #FEF2F2;
+  --c-red-border:   #FECACA;
+  --c-red-text:     #DC2626;
+  --c-red-dark:     #DC2626;
+  --c-green:        #10B981;
+  --c-green-dim:    #ECFDF5;
+  --c-green-border: #A7F3D0;
+  --c-green-text:   #059669;
+  --c-amber:        #F59E0B;
+  --c-amber-dim:    #FFFBEB;
+  --c-amber-border: #FDE68A;
+  --c-amber-text:   #D97706;
+  --c-blue:         #2563EB;
+  --c-blue-dim:     #EFF6FF;
+  --c-blue-border:  #BFDBFE;
+  --c-blue-text:    #1D4ED8;
 
-  --shadow-card:     0 1px 3px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.04);
-  --shadow-hover:    0 6px 20px rgba(0,0,0,0.10), 0 0 0 1px rgba(0,0,0,0.06);
-  --shadow-elevated: 0 12px 40px rgba(0,0,0,0.14);
+  --shadow-card:     0 1px 3px rgba(15,23,42,0.04), 0 1px 2px -1px rgba(15,23,42,0.03);
+  --shadow-hover:    0 10px 25px -5px rgba(15,23,42,0.08), 0 8px 10px -6px rgba(15,23,42,0.04);
+  --shadow-elevated: 0 20px 25px -5px rgba(15,23,42,0.10), 0 8px 10px -6px rgba(15,23,42,0.06);
 }
 
 /* ─── Base ───────────────────────────────────────────────────────────────── */

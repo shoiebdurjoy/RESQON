@@ -1,9 +1,6 @@
 import { useContext, useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import {
-  ArrowLeft, ArrowRight, CheckCircle2, Eye, EyeOff,
-  Lock, Mail, ShieldCheck, Sparkles, Zap
-} from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff, Lock, Mail, ShieldAlert, Sparkles, Zap } from 'lucide-react';
 import AuthContext from '../context/AuthContext';
 
 export default function Login() {
@@ -30,31 +27,35 @@ export default function Login() {
   // Demo profile quick autofill
   function autofillDemo(type) {
     if (type === 'requester') {
-      setEmail('shoiebdurjoy999@gmail.com');
-      setPassword('Password123');
+      setEmail('shoieb@resqon.org');
+      setPassword('Password123!');
       setError('');
     } else if (type === 'helper') {
-      setEmail('sarah.khan@example.com');
-      setPassword('Password123');
+      setEmail('sarah.khan@resqon.org');
+      setPassword('Password123!');
       setError('');
     }
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
+    if (!email.trim() || !password) {
+      setError('Please provide both email and password.');
+      return;
+    }
     setError('');
     setLoading(true);
 
     try {
-      await login(email.trim(), password);
+      await login(email.trim().toLowerCase(), password);
       navigate(from, { replace: true });
     } catch (err) {
       if (err.response?.status === 503 || (typeof err.response?.data === 'string' && err.response.data.includes('suspended'))) {
-        setError('The backend service is currently resuming. Please retry in a few seconds.');
+        setError('The backend service is currently resuming. Please retry in 5 seconds.');
       } else if (err.code === 'ERR_NETWORK' || !err.response) {
-        setError('Cannot connect to the backend server. Please verify your connection.');
+        setError('Cannot connect to backend server. Please verify your connection.');
       } else {
-        setError(err.response?.data?.error || 'Invalid email or password. Please verify credentials.');
+        setError(err.response?.data?.error || err.response?.data?.message || 'Invalid email or password. Please try again.');
       }
     } finally {
       setLoading(false);
@@ -62,535 +63,163 @@ export default function Login() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#F0EFE9', display: 'flex', flexDirection: 'column' }}>
-      {/* Top Header / Return Bar */}
-      <header style={{
-        padding: '1.25rem 2rem',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        borderBottom: '1px solid #E4E2DA',
-        background: '#FFFFFF',
-      }}>
+    <div className="min-h-screen flex flex-col justify-between bg-slate-50 relative selection:bg-red-500 selection:text-white"
+      style={{ fontFamily: "'Plus Jakarta Sans', 'Geist', -apple-system, sans-serif" }}>
+
+      {/* Top subtle navigation bar */}
+      <header className="w-full px-6 py-4 flex items-center justify-between border-b border-slate-200/80 bg-white/70 backdrop-blur-md sticky top-0 z-10">
         <Link
           to="/dashboard"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-            color: '#2E2D2A',
-            textDecoration: 'none',
-            fontSize: '0.875rem',
-            fontWeight: 600,
-            fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif",
-            transition: 'color 0.15s ease',
-          }}
-          onMouseEnter={e => e.currentTarget.style.color = '#D93B2B'}
-          onMouseLeave={e => e.currentTarget.style.color = '#2E2D2A'}
+          className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-red-600 transition-colors"
         >
           <ArrowLeft size={16} />
           <span>Back to Live Operations</span>
         </Link>
 
-        {/* Live Status Badge */}
-        <div style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '0.5rem',
-          fontSize: '0.75rem',
-          fontWeight: 700,
-          color: '#15663E',
-          background: '#EDF8F2',
-          border: '1px solid #A8DCBC',
-          padding: '0.28rem 0.75rem',
-          borderRadius: 99,
-          letterSpacing: '0.04em',
-          textTransform: 'uppercase',
-          fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif",
-        }}>
-          <span style={{
-            width: 7,
-            height: 7,
-            borderRadius: '50%',
-            background: '#1A7F4E',
-            display: 'inline-block',
-            boxShadow: '0 0 0 2px rgba(26,127,78,0.25)',
-            animation: 'pulse 2s infinite',
-          }} />
-          Network Active • Sub-90s SLA
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200/80">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span>Tactical Network Live</span>
         </div>
       </header>
 
-      {/* Main Split Section */}
-      <div style={{
-        flex: 1,
-        display: 'flex',
-        alignItems: 'stretch',
-        justifyContent: 'center',
-      }}>
-        {/* Left Branding / Editorial Showcase (Hidden on small mobile, visible on desktop) */}
-        <div
-          className="hidden lg:flex"
-          style={{
-            width: '46%',
-            background: '#0D0C0A',
-            borderRight: '1px solid #1E1D1A',
-            padding: '4rem 4.5rem',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            color: '#F0EFE9',
-          }}
-        >
-          {/* Logo & Headline */}
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '2.5rem' }}>
-              <div style={{
-                width: 34, height: 34, borderRadius: 8,
-                background: '#D93B2B', display: 'flex',
-                alignItems: 'center', justifyContent: 'center',
-                boxShadow: '0 4px 12px rgba(217,59,43,0.3)',
-              }}>
-                <Zap size={20} color="#FFFFFF" strokeWidth={2.5} />
-              </div>
-              <span style={{
-                fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif",
-                fontWeight: 900,
-                fontSize: '1.25rem',
-                letterSpacing: '-0.04em',
-                color: '#F0EFE9',
-              }}>
-                RESQON
-              </span>
+      {/* Centered Auth Card Container */}
+      <main className="flex-1 flex items-center justify-center px-4 py-12">
+        <div className="w-full max-w-md bg-white border border-slate-200 rounded-2xl shadow-xl shadow-slate-200/50 p-8 sm:p-10 transition-all">
+          
+          {/* Brand Mark */}
+          <div className="flex flex-col items-center text-center mb-8">
+            <div className="w-12 h-12 rounded-xl bg-red-50 border border-red-100 flex items-center justify-center mb-4 shadow-sm">
+              <Zap size={24} className="text-red-600" strokeWidth={2.5} />
             </div>
-
-            <p style={{
-              fontSize: '0.6875rem',
-              fontWeight: 800,
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase',
-              color: '#D93B2B',
-              marginBottom: '1rem',
-              fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif",
-            }}>
-              Autonomous Crisis Coordination Network
-            </p>
-
-            <h1 style={{
-              fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif",
-              fontWeight: 800,
-              fontSize: 'clamp(2.2rem, 3.2vw, 3.1rem)',
-              lineHeight: 1.15,
-              letterSpacing: '-0.035em',
-              color: '#FFFFFF',
-              marginBottom: '1.5rem',
-            }}>
-              When every second counts.
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+              Sign in to RESQON
             </h1>
-
-            <p style={{
-              fontSize: '1rem',
-              color: '#A09D94',
-              lineHeight: 1.65,
-              maxWidth: 440,
-              marginBottom: '3rem',
-            }}>
-              Connecting citizens in acute crisis with on-duty field responders, blood donors, and rapid medical transport in real time.
-            </p>
-
-            {/* Feature Capability Highlights */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              {[
-                {
-                  icon: Zap,
-                  title: 'Rapid Proximity Dispatch',
-                  desc: 'GPS-guided coordination routing the closest available units in under 90 seconds.',
-                },
-                {
-                  icon: ShieldCheck,
-                  title: 'Clinical Triage & Verification',
-                  desc: 'AI-assisted severity classification and 100% verified specialist responders.',
-                },
-                {
-                  icon: Lock,
-                  title: 'Encrypted Real-Time Comms',
-                  desc: 'End-to-end private channels between callers, dispatchers, and field units.',
-                },
-              ].map(({ icon: Icon, title, desc }) => (
-                <div
-                  key={title}
-                  style={{
-                    background: '#151412',
-                    border: '1px solid #23221E',
-                    borderRadius: 12,
-                    padding: '1rem 1.25rem',
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '1rem',
-                  }}
-                >
-                  <div style={{
-                    width: 32, height: 32, borderRadius: 8,
-                    background: '#22201C',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    flexShrink: 0, marginTop: 2,
-                  }}>
-                    <Icon size={16} color="#D93B2B" strokeWidth={2.2} />
-                  </div>
-                  <div>
-                    <p style={{ fontWeight: 700, fontSize: '0.875rem', color: '#F0EFE9', marginBottom: '0.2rem' }}>
-                      {title}
-                    </p>
-                    <p style={{ fontSize: '0.8125rem', color: '#7E7C75', lineHeight: 1.5 }}>
-                      {desc}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Institutional Compliance Notice */}
-          <div style={{ paddingTop: '2rem', borderTop: '1px solid #1E1D1A' }}>
-            <p style={{ fontSize: '0.75rem', color: '#5A5850', fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif" }}>
-              RESQON v1.0.0 • Mission-Critical Operations Platform
+            <p className="text-sm text-slate-500 mt-1.5">
+              Access emergency coordination, triage & dispatch console
             </p>
           </div>
-        </div>
 
-        {/* Right Form Card Container */}
-        <div style={{
-          flex: 1,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '3rem 1.5rem',
-          background: '#F0EFE9',
-        }}>
-          <div
-            className="scale-in"
-            style={{
-              width: '100%',
-              maxWidth: 440,
-              background: '#FFFFFF',
-              border: '1px solid #E4E2DA',
-              borderRadius: 16,
-              boxShadow: '0 8px 30px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04)',
-              padding: '2.5rem 2.25rem',
-            }}
-          >
-            {/* Mobile Header Logo */}
-            <div className="flex lg:hidden" style={{ alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
-              <div style={{ width: 28, height: 28, borderRadius: 6, background: '#D93B2B', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Zap size={16} color="#FFFFFF" strokeWidth={2.5} />
-              </div>
-              <span style={{ fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif", fontWeight: 900, fontSize: '1.125rem', letterSpacing: '-0.035em', color: '#0D0C0A' }}>
-                RESQON
+          {/* Quick 1-Click Demo Login Pills */}
+          <div className="mb-6 p-3.5 bg-slate-50 border border-slate-200/80 rounded-xl">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                1-Click Quick Demo Access
+              </span>
+              <span className="text-[11px] font-medium text-slate-500 flex items-center gap-1">
+                <Sparkles size={11} className="text-amber-500" /> Auto-fill credentials
               </span>
             </div>
-
-            {/* Form Title */}
-            <p style={{
-              fontSize: '0.6875rem',
-              fontWeight: 800,
-              letterSpacing: '0.1em',
-              textTransform: 'uppercase',
-              color: '#8A8878',
-              marginBottom: '0.35rem',
-              fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif",
-            }}>
-              Operations Console Sign In
-            </p>
-
-            <h2 style={{
-              fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif",
-              fontWeight: 800,
-              fontSize: '1.75rem',
-              letterSpacing: '-0.035em',
-              color: '#0D0C0A',
-              marginBottom: '0.5rem',
-              lineHeight: 1.2,
-            }}>
-              Welcome back
-            </h2>
-
-            <p style={{ fontSize: '0.875rem', color: '#5A5850', marginBottom: '1.5rem', lineHeight: 1.5 }}>
-              Enter your credentials to access dispatch tools, or select a demo profile below.
-            </p>
-
-            {/* 1-Click Demo Profiles */}
-            <div style={{
-              background: '#F7F6F1',
-              border: '1px solid #E4E2DA',
-              borderRadius: 10,
-              padding: '0.75rem 0.875rem',
-              marginBottom: '1.5rem',
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginBottom: '0.5rem' }}>
-                <Sparkles size={13} color="#D93B2B" />
-                <span style={{ fontSize: '0.6875rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#5A5850' }}>
-                  1-Click Instant Demo Credentials
-                </span>
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
-                <button
-                  type="button"
-                  onClick={() => autofillDemo('requester')}
-                  style={{
-                    padding: '0.45rem 0.6rem',
-                    borderRadius: 6,
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    background: '#FFFFFF',
-                    border: '1px solid #D0CEC4',
-                    color: '#2E2D2A',
-                    fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif",
-                    textAlign: 'center',
-                    transition: 'all 0.15s ease',
-                  }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#0D0C0A'; e.currentTarget.style.background = '#0D0C0A'; e.currentTarget.style.color = '#FFFFFF'; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = '#D0CEC4'; e.currentTarget.style.background = '#FFFFFF'; e.currentTarget.style.color = '#2E2D2A'; }}
-                >
-                  Requester Demo
-                </button>
-                <button
-                  type="button"
-                  onClick={() => autofillDemo('helper')}
-                  style={{
-                    padding: '0.45rem 0.6rem',
-                    borderRadius: 6,
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    background: '#FFFFFF',
-                    border: '1px solid #D0CEC4',
-                    color: '#2E2D2A',
-                    fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif",
-                    textAlign: 'center',
-                    transition: 'all 0.15s ease',
-                  }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#15663E'; e.currentTarget.style.background = '#15663E'; e.currentTarget.style.color = '#FFFFFF'; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = '#D0CEC4'; e.currentTarget.style.background = '#FFFFFF'; e.currentTarget.style.color = '#2E2D2A'; }}
-                >
-                  Helper Demo
-                </button>
-              </div>
-            </div>
-
-            {/* Error Message */}
-            {error && (
-              <div
-                key={error}
-                className="error-shake"
-                style={{
-                  background: '#FEF3F1',
-                  border: '1px solid #F5C4BE',
-                  borderRadius: 8,
-                  padding: '0.75rem 1rem',
-                  marginBottom: '1.25rem',
-                  fontSize: '0.8125rem',
-                  color: '#B02E20',
-                  fontWeight: 600,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                }}
-              >
-                <span>{error}</span>
-              </div>
-            )}
-
-            {/* Form */}
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.125rem' }}>
-              <div>
-                <label style={{
-                  display: 'block',
-                  fontSize: '0.6875rem',
-                  fontWeight: 700,
-                  color: '#5A5850',
-                  marginBottom: '0.4rem',
-                  letterSpacing: '0.07em',
-                  textTransform: 'uppercase',
-                }}>
-                  Email Address
-                </label>
-                <div style={{ position: 'relative' }}>
-                  <div style={{
-                    position: 'absolute', left: '0.85rem', top: '50%',
-                    transform: 'translateY(-50%)', color: '#8A8878',
-                    display: 'flex', alignItems: 'center',
-                  }}>
-                    <Mail size={16} />
-                  </div>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    required
-                    placeholder="you@example.com"
-                    autoComplete="email"
-                    style={{
-                      width: '100%',
-                      padding: '0.75rem 0.875rem 0.75rem 2.6rem',
-                      background: '#FFFFFF',
-                      border: '1.5px solid #D0CEC4',
-                      borderRadius: 8,
-                      fontSize: '0.9375rem',
-                      fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif",
-                      outline: 'none',
-                      transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
-                      boxSizing: 'border-box',
-                    }}
-                    onFocus={e => {
-                      e.target.style.borderColor = '#0D0C0A';
-                      e.target.style.boxShadow = '0 0 0 3px rgba(13,12,10,0.08)';
-                    }}
-                    onBlur={e => {
-                      e.target.style.borderColor = '#D0CEC4';
-                      e.target.style.boxShadow = 'none';
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
-                  <label style={{
-                    fontSize: '0.6875rem',
-                    fontWeight: 700,
-                    color: '#5A5850',
-                    letterSpacing: '0.07em',
-                    textTransform: 'uppercase',
-                  }}>
-                    Password
-                  </label>
-                  <span style={{ fontSize: '0.75rem', color: '#8A8878' }}>
-                    Min. 6 characters
-                  </span>
-                </div>
-                <div style={{ position: 'relative' }}>
-                  <div style={{
-                    position: 'absolute', left: '0.85rem', top: '50%',
-                    transform: 'translateY(-50%)', color: '#8A8878',
-                    display: 'flex', alignItems: 'center',
-                  }}>
-                    <Lock size={16} />
-                  </div>
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
-                    required
-                    placeholder="••••••••"
-                    autoComplete="current-password"
-                    style={{
-                      width: '100%',
-                      padding: '0.75rem 2.6rem 0.75rem 2.6rem',
-                      background: '#FFFFFF',
-                      border: '1.5px solid #D0CEC4',
-                      borderRadius: 8,
-                      fontSize: '0.9375rem',
-                      fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif",
-                      outline: 'none',
-                      transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
-                      boxSizing: 'border-box',
-                    }}
-                    onFocus={e => {
-                      e.target.style.borderColor = '#0D0C0A';
-                      e.target.style.boxShadow = '0 0 0 3px rgba(13,12,10,0.08)';
-                    }}
-                    onBlur={e => {
-                      e.target.style.borderColor = '#D0CEC4';
-                      e.target.style.boxShadow = 'none';
-                    }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(s => !s)}
-                    style={{
-                      position: 'absolute', right: '0.85rem', top: '50%',
-                      transform: 'translateY(-50%)', background: 'none',
-                      border: 'none', cursor: 'pointer', color: '#8A8878',
-                      padding: 0, display: 'flex', alignItems: 'center',
-                    }}
-                    title={showPassword ? 'Hide password' : 'Show password'}
-                  >
-                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
-                </div>
-              </div>
-
+            <div className="grid grid-cols-2 gap-2">
               <button
-                type="submit"
-                disabled={loading}
-                style={{
-                  width: '100%',
-                  marginTop: '0.5rem',
-                  padding: '0.85rem 1.25rem',
-                  borderRadius: 8,
-                  background: '#0D0C0A',
-                  color: '#FFFFFF',
-                  border: 'none',
-                  fontSize: '0.9375rem',
-                  fontWeight: 700,
-                  fontFamily: "'Plus Jakarta Sans', 'Geist', sans-serif",
-                  cursor: loading ? 'not-allowed' : 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '0.5rem',
-                  transition: 'all 0.16s ease',
-                  boxShadow: '0 4px 14px rgba(13,12,10,0.18)',
-                }}
-                onMouseEnter={e => { if (!loading) e.currentTarget.style.transform = 'translateY(-1px)'; }}
-                onMouseLeave={e => { if (!loading) e.currentTarget.style.transform = 'none'; }}
+                type="button"
+                onClick={() => autofillDemo('requester')}
+                className="px-3 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-200 rounded-lg hover:border-red-400 hover:text-red-600 hover:shadow-sm transition-all text-left flex items-center gap-1.5"
               >
-                {loading ? (
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <span style={{
-                      width: 15, height: 15, borderRadius: '50%',
-                      border: '2px solid rgba(255,255,255,0.3)',
-                      borderTopColor: '#FFFFFF',
-                      animation: 'spin 0.7s linear infinite',
-                      display: 'inline-block',
-                    }} />
-                    Signing in…
-                  </span>
-                ) : (
-                  <>
-                    Sign In to Console <ArrowRight size={16} />
-                  </>
-                )}
+                <span>👤</span>
+                <span className="truncate">Requester (Shoieb)</span>
               </button>
-            </form>
-
-            {/* Switch to Register */}
-            <div style={{ marginTop: '1.75rem', paddingTop: '1.25rem', borderTop: '1px solid #F0EFE9', textAlign: 'center' }}>
-              <p style={{ fontSize: '0.875rem', color: '#5A5850', margin: 0 }}>
-                Don't have an operator account?{' '}
-                <Link
-                  to="/register"
-                  style={{
-                    color: '#D93B2B',
-                    fontWeight: 700,
-                    textDecoration: 'none',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.2rem',
-                  }}
-                >
-                  Create account →
-                </Link>
-              </p>
+              <button
+                type="button"
+                onClick={() => autofillDemo('helper')}
+                className="px-3 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-200 rounded-lg hover:border-emerald-400 hover:text-emerald-700 hover:shadow-sm transition-all text-left flex items-center gap-1.5"
+              >
+                <span>🩺</span>
+                <span className="truncate">Responder (Dr. Sarah)</span>
+              </button>
             </div>
           </div>
-        </div>
-      </div>
 
-      <style>{`
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-      `}</style>
+          {/* Error Notice */}
+          {error && (
+            <div className="mb-6 p-3.5 rounded-xl bg-red-50 border border-red-200 flex items-start gap-2.5 text-xs text-red-800">
+              <ShieldAlert size={16} className="text-red-600 shrink-0 mt-0.5" />
+              <span className="leading-relaxed">{error}</span>
+            </div>
+          )}
+
+          {/* Login Form */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Email Field */}
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                Email Address
+              </label>
+              <div className="relative">
+                <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder="name@example.com"
+                  required
+                  autoFocus
+                  className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all font-medium"
+                />
+              </div>
+            </div>
+
+            {/* Password Field */}
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                Password
+              </label>
+              <div className="relative">
+                <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  required
+                  className="w-full pl-10 pr-11 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all font-medium"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 transition-colors"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full mt-2 py-3 px-4 bg-red-600 hover:bg-red-700 text-white text-sm font-bold rounded-xl shadow-md shadow-red-600/25 hover:shadow-lg hover:shadow-red-600/35 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:pointer-events-none transition-all flex items-center justify-center gap-2"
+            >
+              {loading ? (
+                <>
+                  <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                  <span>Authenticating…</span>
+                </>
+              ) : (
+                <span>Sign in to Console</span>
+              )}
+            </button>
+          </form>
+
+          {/* Footer Card Links */}
+          <div className="mt-8 pt-6 border-t border-slate-100 text-center">
+            <p className="text-xs text-slate-500">
+              Don't have an account yet?{' '}
+              <Link
+                to="/register"
+                className="font-bold text-red-600 hover:text-red-700 transition-colors underline-offset-4 hover:underline"
+              >
+                Join the Network
+              </Link>
+            </p>
+          </div>
+        </div>
+      </main>
+
+      {/* Subtle modern page footer */}
+      <footer className="w-full py-4 text-center text-xs text-slate-400 border-t border-slate-200/60 bg-white/40">
+        <span>RESQON Emergency Coordination System • Dhaka Operations Grid</span>
+      </footer>
     </div>
   );
 }
